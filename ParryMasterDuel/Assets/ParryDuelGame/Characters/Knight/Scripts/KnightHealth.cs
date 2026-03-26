@@ -1,0 +1,110 @@
+using UnityEngine;
+using FirstGearGames.SmoothCameraShaker;
+public class KnightHealth : MonoBehaviour
+{
+    [Header("Health")]
+    public float maxHealth = 100f;
+    private float currentHealth;
+
+    [Header("Knockback")]
+    public float knockbackForce = 5f;
+    public float knockbackDuration = 0.2f;
+
+    [Header("VFX")]
+    public GameObject bloodPrefab;
+    public Transform bloodSpawnPoint;
+
+    private Rigidbody2D rb;
+    private Animator animator;
+    private bool isKnockedBack;
+    private float knockbackTimer;
+    public ShakeData CameraShake;
+    public bool IsKnockedBack => isKnockedBack;
+    private KnightMovement movement;
+    public ShakeData CameraShakeParry;
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        currentHealth = maxHealth;
+        movement = GetComponent<KnightMovement>();
+    }
+
+    void Update()
+    {
+        if (isKnockedBack)
+        {
+            knockbackTimer -= Time.deltaTime;
+            if (knockbackTimer <= 0f)
+                isKnockedBack = false;
+        }
+    }
+
+    public void TakeDamage(float amount, Vector2 attackerPosition)
+    {
+        if (movement.IsInParryWindow())
+        {
+            // Successful parry — spawn parry VFX
+            if (movement.parryVFXPrefab != null && movement.parryVFXSpawnPoint != null)
+                Instantiate(movement.parryVFXPrefab, movement.parryVFXSpawnPoint.position, movement.parryVFXPrefab.transform.rotation);
+
+            // Play parry animation
+            animator.SetTrigger("Parry");
+            CameraShakerHandler.Shake(CameraShakeParry);
+            // Find attacker and stun them — attacker is VikingMovement
+            VikingMovement attacker = FindAttacker<VikingMovement>(attackerPosition);
+            if (attacker != null)
+            {
+                attacker.TriggerParryStun(transform.position);
+                attacker.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
+            return; // parry absorbs everything, no damage, no posture damage
+        }
+        if (movement.IsBlocking())
+        {
+            Vector2 knockbackDire = ((Vector2)transform.position - attackerPosition).normalized;
+            rb.linearVelocity = Vector2.zero;
+            rb.AddForce(knockbackDire * knockbackForce, ForceMode2D.Impulse);
+            isKnockedBack = true;
+            knockbackTimer = knockbackDuration;
+            if (bloodPrefab != null && bloodSpawnPoint != null)
+                Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
+            movement.AbsorbBlockedHit(amount, attackerPosition);
+            float reducedDamage = amount * (1f - movement.blockDamageReduction);
+            currentHealth -= reducedDamage;
+            currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+            Debug.Log($"Knight blocked! Took reduced damage: {reducedDamage}. HP left: {currentHealth}");
+            if (currentHealth <= 0f) Die();
+            return;
+        }
+
+        currentHealth -= amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+        Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+        isKnockedBack = true;
+        knockbackTimer = knockbackDuration;
+        CameraShakerHandler.Shake(CameraShake);
+        animator.SetTrigger("TakeDamage");
+        if (bloodPrefab != null && bloodSpawnPoint != null)
+            Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
+        Debug.Log($"Knight took {amount} damage. HP left: {currentHealth}");
+        if (currentHealth <= 0f)
+            Die();
+    }
+    T FindAttacker<T>(Vector2 position) where T : Component
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(position, 1f);
+        foreach (var h in hits)
+        {
+            T comp = h.GetComponent<T>();
+            if (comp != null) return comp;
+        }
+        return null;
+    }
+    void Die()
+    {
+        Debug.Log("Knight is dead!");
+    }
+}
