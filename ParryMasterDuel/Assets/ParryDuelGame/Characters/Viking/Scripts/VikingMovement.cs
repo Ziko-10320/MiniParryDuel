@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using FirstGearGames.SmoothCameraShaker;
-public class VikingMovement : MonoBehaviour
+public class VikingMovement : MonoBehaviour, IFinishable
 {
     [Header("Movement")]
     public float moveSpeed = 6f;
@@ -13,11 +13,18 @@ public class VikingMovement : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
 
-    [Header("Dash")]
-    public bool canDash = false;
-    public float dashSpeed = 20f;
-    public float dashDuration = 0.15f;
-    public float dashCooldown = 1f;
+    [Header("Roll")]
+    public float rollSpeed = 12f;
+    public float rollDuration = 0.4f;
+    public float doubleTapWindow = 0.3f;
+
+    private bool isRolling;
+    private float rollTimer;
+    private float lastTapTime;
+    private float lastTapDirection;
+
+    public float rollCooldown = 1f;
+    private float rollCooldownTimer;
 
     [Header("Player Assignment")]
     public bool isPlayer1 = false;
@@ -28,11 +35,7 @@ public class VikingMovement : MonoBehaviour
 
     private float moveInput;
     private bool isGrounded;
-
-    private bool isDashing;
-    private float dashTimer;
-    private float dashCooldownTimer;
-    private float dashDirection;
+ 
     [Header("Attack")]
     public Transform attackPoint;
     public Vector2 attackBox = new Vector2(1f, 1f);
@@ -42,6 +45,7 @@ public class VikingMovement : MonoBehaviour
     private bool isAttacking;
 
     public ShakeData CameraShake ;
+    public ShakeData CameraShakeheavy;
     [Header("Block")]
     public float blockDamageReduction = 0.5f;
     public float maxPosture = 100f;
@@ -56,6 +60,8 @@ public class VikingMovement : MonoBehaviour
     private float stunTimer;
     private VikingHealth vikingHealth;
 
+    public float blockCooldown = 1f;
+    private float blockCooldownTimer;
     public float parryWindow = 0.2f;
     public float parryStunDuration = 1.5f;
     public float parryPostureDamage = 30f;
@@ -70,35 +76,45 @@ public class VikingMovement : MonoBehaviour
     [Header("Lunge")]
     public float lungeForce = 8f;
     public float lungeDuration = 0.2f;
+    public bool parryInstantBlock;
+    private GhostTrail ghostTrail;
+
+    private bool isFinishable;
+    public bool IsFinishable() => isFinishable;
+
+    [Header("Death")]
+    public GameObject headPrefab;
+    public Transform headSpawnPoint;
+    public float headUpwardForce = 8f;
+    public float headHorizontalForce = 4f;
+    public float headTorque = 200f;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         currentPosture = maxPosture;
         vikingHealth = GetComponent<VikingHealth>();
+        ghostTrail = GetComponent<GhostTrail>();
     }
-    public void OnSpecialPerformed()
-    {
-        if (canJump && !canDash) TryJump();
-        else if (canDash && !canJump) TryDash();
-    }
+   
     void Update()
     {
+        if (isFinishable) return;
         // Ground check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // Dash cooldown tick
-        if (dashCooldownTimer > 0f)
-            dashCooldownTimer -= Time.deltaTime;
-
-        // Skip normal movement logic while dashing
-        if (isDashing)
+        if (isRolling)
         {
-            dashTimer -= Time.deltaTime;
-            if (dashTimer <= 0f)
-                isDashing = false;
+            rollTimer -= Time.deltaTime;
+            if (rollTimer <= 0f)
+            {
+                if (ghostTrail != null) ghostTrail.StopTrail();
+                isRolling = false;
+            }
             return;
         }
+        if (rollCooldownTimer > 0f)
+            rollCooldownTimer -= Time.deltaTime;
         // Stun timer
         if (isStunned)
         {
@@ -120,6 +136,8 @@ public class VikingMovement : MonoBehaviour
             if (parryWindowTimer <= 0f)
                 isInParryWindow = false;
         }
+        if (blockCooldownTimer > 0f)
+            blockCooldownTimer -= Time.deltaTime;
         HandleMovement();
         HandleAnimation();
     }
@@ -145,6 +163,22 @@ public class VikingMovement : MonoBehaviour
     }
     public void SetMoveInput(float value)
     {
+        if (value != 0f && value != moveInput)
+        {
+            float currentDirection = Mathf.Sign(value);
+
+            if (currentDirection == lastTapDirection && Time.time - lastTapTime < doubleTapWindow)
+            {
+                TryRoll(currentDirection);
+                lastTapTime = -1f; // reset so triple tap doesn't chain
+            }
+            else
+            {
+                lastTapTime = Time.time;
+                lastTapDirection = currentDirection;
+            }
+        }
+
         moveInput = value;
     }
     // ── Animation ─────────────────────────────────────────────
@@ -152,33 +186,62 @@ public class VikingMovement : MonoBehaviour
     {
         animator.SetBool("isRunning", moveInput != 0f);
     }
+    void TryRoll(float direction)
+    {
+        if (isFinishable) return;
+        if (isStunned) return;
+        if (isRolling) return;
+        if (isBlocking) return;
+        if (rollCooldownTimer > 0f) return;
 
+        isRolling = true;
+        rollCooldownTimer = rollCooldown;
+        rollTimer = rollDuration;
+        rb.linearVelocity = new Vector2(direction * rollSpeed, rb.linearVelocity.y);
+
+        // forward = rolling in the direction the sprite is facing
+        // backward = rolling opposite to the direction the sprite is facing
+        bool isForward = direction == Mathf.Sign(transform.localScale.x);
+
+        if (isForward)
+            animator.SetTrigger("Roll");
+        else
+            animator.SetTrigger("RollBack");
+
+        if (ghostTrail != null) ghostTrail.StartTrail();
+    }
     // ── Jump ──────────────────────────────────────────────────
     void TryJump()
     {
+        if (isFinishable) return;
         if (!isGrounded) return;
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
-    // ── Dash ──────────────────────────────────────────────────
-    void TryDash()
+    public void OnSpecialPerformed()
     {
-        if (dashCooldownTimer > 0f) return;
-
-        // Dash in the direction the sprite is currently facing
-        dashDirection = transform.localScale.x; // +1 right, -1 left
-
-        isDashing = true;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
-
-        rb.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
+        if (isFinishable) return;
+        if (canJump) TryJump();
     }
+
     public void TriggerAttack()
     {
+        if (isFinishable) return;
         if (isStunned) return;
         if (isAttacking) return;
+        Collider2D hit = Physics2D.OverlapBox(attackPoint.position, attackBox, 0f, enemyLayer);
+        if (hit != null)
+        {
+            IFinishable finishable = hit.GetComponent<IFinishable>();
+            if (finishable != null && finishable.IsFinishable())
+            {
+                isAttacking = true;
+                animator.SetTrigger("Finisher");
+                finishable.GetFinished();
+                return;
+            }
+        }
         isAttacking = true;
         animator.SetTrigger("Attack");
     }
@@ -191,6 +254,18 @@ public class VikingMovement : MonoBehaviour
             if (knightHealth != null)
                 knightHealth.TakeDamage(attackDamage, transform.position);
         }
+        if (hit != null)
+        {
+            NinjaHealth ninjaHealth = hit.GetComponent<NinjaHealth>();
+            if (ninjaHealth != null)
+                ninjaHealth.TakeDamage(attackDamage, transform.position);
+        }
+        if (hit != null)
+        {
+            SoldierHealth soldierHealth = hit.GetComponent<SoldierHealth>();
+            if (soldierHealth != null)
+                soldierHealth.TakeDamage(attackDamage, transform.position);
+        }
     }
     public void EndAttack()
     {
@@ -200,9 +275,16 @@ public class VikingMovement : MonoBehaviour
     {
         CameraShakerHandler.Shake(CameraShake );
     }
-    public void StartBlock()
+    public void CameraShakeHeavy()
     {
+        CameraShakerHandler.Shake(CameraShakeheavy);
+    }
+    public void StartBlock(bool ignoreParryCooldown = false)
+    {
+        if (isFinishable) return;
         if (isStunned) return;
+        if (blockCooldownTimer > 0f && !parryInstantBlock) return;
+        parryInstantBlock = false;
         animator.ResetTrigger("StartBlock");
         animator.ResetTrigger("EndBlock");
         isBlocking = true;
@@ -214,7 +296,9 @@ public class VikingMovement : MonoBehaviour
 
     public void EndBlock()
     {
+        if (!isBlocking) return;
         isBlocking = false;
+        blockCooldownTimer = blockCooldown;
         animator.SetTrigger("EndBlock");
     }
 
@@ -263,6 +347,45 @@ public class VikingMovement : MonoBehaviour
         stunTimer = stunDuration;
         animator.SetTrigger("EndBlock");
         animator.SetBool("isStunned", true);
+        GetComponent<NinjaHealth>()?.CheckFinishable();
+    }
+    public void EnterFinishableState()
+    {
+        isFinishable = true;
+        isBlocking = false;
+        isAttacking = false;
+        isRolling = false;
+        rb.linearVelocity = Vector2.zero;
+        animator.SetTrigger("Finishable");
+    }
+
+    public void GetFinished()
+    {
+        isFinishable = false;
+        animator.SetTrigger("GetFinished");
+        StartCoroutine(DisableAfterDelay(2.5f));
+    }
+
+    System.Collections.IEnumerator DisableAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        gameObject.SetActive(false);
+    }
+    public void SpawnHead()
+    {
+        if (headPrefab == null || headSpawnPoint == null) return;
+
+        GameObject head = Instantiate(headPrefab, headSpawnPoint.position, headPrefab.transform.rotation);
+
+        Rigidbody2D headRb = head.GetComponent<Rigidbody2D>();
+        if (headRb == null) return;
+
+        // horizontal direction is random left or right for variety
+        float horizontalDir = Random.value > 0.5f ? 1f : -1f;
+
+        headRb.AddForce(new Vector2(horizontalDir * headHorizontalForce, headUpwardForce), ForceMode2D.Impulse);
+        headRb.AddTorque(headTorque * horizontalDir);
+        Destroy(head, 2f);
     }
     void OnDrawGizmosSelected()
     {

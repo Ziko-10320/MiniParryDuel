@@ -22,6 +22,9 @@ public class VikingHealth : MonoBehaviour
     public ShakeData CameraShakeParry;
     public bool IsKnockedBack => isKnockedBack;
     private VikingMovement movement;
+
+    private bool isFinishable;
+    public bool IsFinishable => isFinishable;
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -42,6 +45,7 @@ public class VikingHealth : MonoBehaviour
 
     public void TakeDamage(float amount, Vector2 attackerPosition)
     {
+        if (isFinishable) return;
         if (movement.IsInParryWindow())
         {
             // Successful parry — spawn parry VFX
@@ -57,6 +61,19 @@ public class VikingHealth : MonoBehaviour
                 attacker.TriggerParryStun(transform.position);
                 attacker.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            NinjaMovement attackerninja = FindAttacker<NinjaMovement>(attackerPosition);
+            if (attackerninja != null)
+            {
+                attackerninja.TriggerParryStun(transform.position);
+                attackerninja.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
+            SoldierMovement attackersoldier = FindAttacker<SoldierMovement>(attackerPosition);
+            if (attackersoldier != null)
+            {
+                attackersoldier.TriggerParryStun(transform.position);
+                attackersoldier.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
+            movement.parryInstantBlock = true;
             return; // parry absorbs everything, no damage, no posture damage
         }
         if (movement.IsBlocking())
@@ -104,6 +121,13 @@ public class VikingHealth : MonoBehaviour
     }
     void Die()
     {
-        Debug.Log("Viking is dead!");
+        if (isFinishable) return;
+        isFinishable = true;
+        movement.EnterFinishableState();
+    }
+    public void CheckFinishable()
+    {
+        if (!isFinishable && currentHealth <= 0f)
+            Die();
     }
 }
