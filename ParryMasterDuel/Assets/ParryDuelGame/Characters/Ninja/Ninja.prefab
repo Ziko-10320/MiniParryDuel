@@ -814,7 +814,7 @@ MonoBehaviour:
   attackDamage: 25
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 1408
+    m_Bits: 3456
   CameraShake: {fileID: 11400000, guid: 43c0b0a4df1b9ba4793561765754cdc6, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6

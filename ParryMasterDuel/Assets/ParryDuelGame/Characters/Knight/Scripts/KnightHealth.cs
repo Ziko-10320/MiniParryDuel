@@ -74,6 +74,12 @@ public class KnightHealth : MonoBehaviour
                 attackersoldier.TriggerParryStun(transform.position);
                 attackersoldier.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            CaveManMovement attackerCM = FindAttacker<CaveManMovement>(attackerPosition);
+            if (attackerCM != null)
+            {
+                attackerCM.TriggerParryStun(transform.position);
+                attackerCM.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
             movement.parryInstantBlock = true;
             return; // parry absorbs everything, no damage, no posture damage
         }

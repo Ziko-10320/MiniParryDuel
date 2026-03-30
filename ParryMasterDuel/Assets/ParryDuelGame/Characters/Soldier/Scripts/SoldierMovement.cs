@@ -268,7 +268,12 @@ public class SoldierMovement : MonoBehaviour, IFinishable
             if (knightHealth != null)
                 knightHealth.TakeDamage(attackDamage, transform.position);
         }
-
+        if (hit != null)
+        {
+            CaveManHealth caveManHealth = hit.GetComponent<CaveManHealth>();
+            if (caveManHealth != null)
+                caveManHealth.TakeDamage(attackDamage, transform.position);
+        }
     }
     public void EndAttack()
     {

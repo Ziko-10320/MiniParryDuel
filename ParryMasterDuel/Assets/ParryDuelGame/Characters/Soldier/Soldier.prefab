@@ -521,7 +521,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &658985444064669357
 Transform:
   m_ObjectHideFlags: 0
@@ -672,7 +672,7 @@ MonoBehaviour:
   attackDamage: 25
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 896
+    m_Bits: 2944
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6
