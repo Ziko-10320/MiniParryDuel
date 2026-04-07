@@ -5,14 +5,19 @@ public class CaveManMovement : MonoBehaviour, IFinishable
 {
     [Header("Movement")]
     public float moveSpeed = 6f;
-
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip runLoopClip;
+    public AudioClip jumpClip;
+    public AudioClip[] rollSounds;
+    public AudioClip[] attackSounds;
     [Header("Jump")]
     public bool canJump = false;
     public float jumpForce = 12f;
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-
+    private bool isRunning;
     [Header("Roll")]
     public float rollSpeed = 12f;
     public float rollDuration = 0.4f;
@@ -106,13 +111,18 @@ public class CaveManMovement : MonoBehaviour, IFinishable
         ghostTrail = GetComponent<GhostTrail>();
     }
 
-
+    public void PlayRandomAttackSound()
+    {
+        if (attackSounds == null || attackSounds.Length == 0) return;
+        AudioClip clip = attackSounds[Random.Range(0, attackSounds.Length)];
+        if (clip != null) audioSource.PlayOneShot(clip);
+    }
     void Update()
     {
         if (isFinishable) return;
         // Ground check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
+       
         if (isRolling)
         {
             rollTimer -= Time.deltaTime;
@@ -194,7 +204,24 @@ public class CaveManMovement : MonoBehaviour, IFinishable
     // ── Animation ─────────────────────────────────────────────
     void HandleAnimation()
     {
+        bool running = moveInput != 0f && isGrounded && !isAttacking && !isBlocking;
         animator.SetBool("isRunning", moveInput != 0f);
+
+        if (running && !isRunning)
+        {
+            isRunning = true;
+            if (runLoopClip != null)
+            {
+                audioSource.clip = runLoopClip;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+        else if (!running && isRunning)
+        {
+            isRunning = false;
+            audioSource.Stop();
+        }
     }
     void TryRoll(float direction)
     {
@@ -219,6 +246,11 @@ public class CaveManMovement : MonoBehaviour, IFinishable
             animator.SetTrigger("RollBack");
 
         if (ghostTrail != null) ghostTrail.StartTrail();
+        if (rollSounds != null && rollSounds.Length > 0)
+        {
+            AudioClip clip = rollSounds[Random.Range(0, rollSounds.Length)];
+            if (clip != null) audioSource.PlayOneShot(clip);
+        }
     }
     // ── Jump ──────────────────────────────────────────────────
     void TryJump()
@@ -227,6 +259,7 @@ public class CaveManMovement : MonoBehaviour, IFinishable
         if (!isGrounded) return;
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        if (jumpClip != null) audioSource.PlayOneShot(jumpClip);
     }
 
     public void OnSpecialPerformed()
@@ -239,11 +272,13 @@ public class CaveManMovement : MonoBehaviour, IFinishable
         if (isFinishable) return;
         if (isStunned) return;
         if (isAttacking) return;
-        if (boomerangInFlight) return;
-        Collider2D hit = Physics2D.OverlapBox(attackPoint.position, attackBox, 0f, enemyLayer);
-        if (hit != null)
+
+        Collider2D[] hits = Physics2D.OverlapBoxAll(attackPoint.position, attackBox, 0f, enemyLayer);
+        foreach (Collider2D hit in hits)
         {
-            IFinishable finishable = hit.GetComponent<IFinishable>();
+            if (hit.gameObject == gameObject) continue;
+
+            IFinishable finishable = hit.GetComponentInParent<IFinishable>();
             if (finishable != null && finishable.IsFinishable())
             {
                 isAttacking = true;
@@ -252,35 +287,22 @@ public class CaveManMovement : MonoBehaviour, IFinishable
                 return;
             }
         }
+
         isAttacking = true;
         animator.SetTrigger("Attack");
     }
     public void DealDamage()
     {
-        Collider2D hit = Physics2D.OverlapBox(attackPoint.position, attackBox, 0f, enemyLayer);
-        if (hit != null)
+        Collider2D[] hits = Physics2D.OverlapBoxAll(attackPoint.position, attackBox, 0f, enemyLayer);
+        foreach (Collider2D hit in hits)
         {
-            VikingHealth vikingHealth = hit.GetComponent<VikingHealth>();
-            if (vikingHealth != null)
-                vikingHealth.TakeDamage(attackDamage, transform.position);
-        }
-        if (hit != null)
-        {
-            NinjaHealth ninjaHealth = hit.GetComponent<NinjaHealth>();
-            if (ninjaHealth != null)
-                ninjaHealth.TakeDamage(attackDamage, transform.position);
-        }
-        if (hit != null)
-        {
-            SoldierHealth soldierHealth = hit.GetComponent<SoldierHealth>();
-            if (soldierHealth != null)
-                soldierHealth.TakeDamage(attackDamage, transform.position);
-        }
-        if (hit != null)
-        {
-            KnightHealth knightHealth = hit.GetComponent<KnightHealth>();
-            if (knightHealth != null)
-                knightHealth.TakeDamage(attackDamage, transform.position);
+            if (hit.gameObject == gameObject) continue;
+
+            if (hit.GetComponent<KnightHealth>() is KnightHealth kh) { kh.TakeDamage(attackDamage, transform.position); return; }
+            if (hit.GetComponent<VikingHealth>() is VikingHealth vh) { vh.TakeDamage(attackDamage, transform.position); return; }
+            if (hit.GetComponent<NinjaHealth>() is NinjaHealth nh) { nh.TakeDamage(attackDamage, transform.position); return; }
+            if (hit.GetComponent<SoldierHealth>() is SoldierHealth sh) { sh.TakeDamage(attackDamage, transform.position); return; }
+            if (hit.GetComponent<CaveManHealth>() is CaveManHealth ch) { ch.TakeDamage(attackDamage, transform.position); return; }
         }
     }
     public void EndAttack()
@@ -375,6 +397,8 @@ public class CaveManMovement : MonoBehaviour, IFinishable
         isRolling = false;
         rb.linearVelocity = Vector2.zero;
         animator.SetTrigger("Finishable");
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnPlayerFinishable(gameObject);
     }
 
     public void GetFinished()
@@ -387,6 +411,8 @@ public class CaveManMovement : MonoBehaviour, IFinishable
     System.Collections.IEnumerator DisableAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+        if (GameManager.Instance != null)
+            GameManager.Instance.OnPlayerDisabled(gameObject);
         gameObject.SetActive(false);
     }
     public void SpawnHead()

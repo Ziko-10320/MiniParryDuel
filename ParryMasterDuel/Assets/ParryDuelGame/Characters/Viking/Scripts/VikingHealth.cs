@@ -5,11 +5,15 @@ public class VikingHealth : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
-
+    public float CurrentHealth => currentHealth;
     [Header("Knockback")]
     public float knockbackForce = 5f;
     public float knockbackDuration = 0.2f;
-
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip[] hitSounds;
+    public AudioClip[] blockSounds;
+    public AudioClip[] parrySounds;
     [Header("VFX")]
     public GameObject bloodPrefab;
     public Transform bloodSpawnPoint;
@@ -42,7 +46,12 @@ public class VikingHealth : MonoBehaviour
                 isKnockedBack = false;
         }
     }
-
+    void PlayRandom(AudioClip[] clips)
+    {
+        if (clips == null || clips.Length == 0) return;
+        AudioClip clip = clips[Random.Range(0, clips.Length)];
+        if (clip != null) audioSource.PlayOneShot(clip);
+    }
     public void TakeDamage(float amount, Vector2 attackerPosition)
     {
         if (isFinishable) return;
@@ -55,6 +64,7 @@ public class VikingHealth : MonoBehaviour
             // Play parry animation
             CameraShakerHandler.Shake(CameraShakeParry);
             animator.SetTrigger("Parry");
+            PlayRandom(parrySounds);
             KnightMovement attacker = FindAttacker<KnightMovement>(attackerPosition);
             if (attacker != null)
             {
@@ -92,6 +102,7 @@ public class VikingHealth : MonoBehaviour
             if (bloodPrefab != null && bloodSpawnPoint != null)
                 Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
             movement.AbsorbBlockedHit(amount, attackerPosition);
+            PlayRandom(blockSounds);
             float reducedDamage = amount * (1f - movement.blockDamageReduction);
             currentHealth -= reducedDamage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
@@ -109,6 +120,7 @@ public class VikingHealth : MonoBehaviour
         knockbackTimer = knockbackDuration;
         CameraShakerHandler.Shake(CameraShake);
         animator.SetTrigger("TakeDamage");
+        PlayRandom(hitSounds);
         if (bloodPrefab != null && bloodSpawnPoint != null)
             Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
         Debug.Log($"Viking took {amount} damage. HP left: {currentHealth}");
@@ -130,6 +142,8 @@ public class VikingHealth : MonoBehaviour
         if (isFinishable) return;
         isFinishable = true;
         movement.EnterFinishableState();
+      
+
     }
     public void CheckFinishable()
     {

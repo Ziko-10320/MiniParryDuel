@@ -2,10 +2,15 @@ using UnityEngine;
 using FirstGearGames.SmoothCameraShaker;
 public class KnightHealth : MonoBehaviour
 {
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip[] hitSounds;
+    public AudioClip[] blockSounds;
+    public AudioClip[] parrySounds;
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
-
+    public float CurrentHealth => currentHealth;
     [Header("Knockback")]
     public float knockbackForce = 5f;
     public float knockbackDuration = 0.2f;
@@ -42,7 +47,12 @@ public class KnightHealth : MonoBehaviour
                 isKnockedBack = false;
         }
     }
-
+    void PlayRandom(AudioClip[] clips)
+    {
+        if (clips == null || clips.Length == 0) return;
+        AudioClip clip = clips[Random.Range(0, clips.Length)];
+        if (clip != null) audioSource.PlayOneShot(clip);
+    }
     public void TakeDamage(float amount, Vector2 attackerPosition)
     {
         if (isFinishable) return;
@@ -54,6 +64,7 @@ public class KnightHealth : MonoBehaviour
 
             // Play parry animation
             animator.SetTrigger("Parry");
+            PlayRandom(parrySounds);
             CameraShakerHandler.Shake(CameraShakeParry);
             // Find attacker and stun them — attacker is VikingMovement
             VikingMovement attacker = FindAttacker<VikingMovement>(attackerPosition);
@@ -93,6 +104,7 @@ public class KnightHealth : MonoBehaviour
             if (bloodPrefab != null && bloodSpawnPoint != null)
                 Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
             movement.AbsorbBlockedHit(amount, attackerPosition);
+            PlayRandom(blockSounds);
             float reducedDamage = amount * (1f - movement.blockDamageReduction);
             currentHealth -= reducedDamage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
@@ -110,6 +122,7 @@ public class KnightHealth : MonoBehaviour
         knockbackTimer = knockbackDuration;
         CameraShakerHandler.Shake(CameraShake);
         animator.SetTrigger("TakeDamage");
+        PlayRandom(hitSounds);
         if (bloodPrefab != null && bloodSpawnPoint != null)
             Instantiate(bloodPrefab, bloodSpawnPoint.position, Quaternion.identity);
         Debug.Log($"Knight took {amount} damage. HP left: {currentHealth}");
@@ -131,6 +144,8 @@ public class KnightHealth : MonoBehaviour
         if (isFinishable) return;
         isFinishable = true;
         movement.EnterFinishableState();
+       
+
     }
     public void CheckFinishable()
     {

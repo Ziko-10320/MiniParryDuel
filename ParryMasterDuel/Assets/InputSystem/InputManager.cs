@@ -3,215 +3,222 @@ using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
-    [Header("Characters")]
-    public KnightMovement knight;
-    public VikingMovement viking;
-    public NinjaMovement  ninja;
-    public SoldierMovement soldier;
-    public CaveManMovement caveMan;
-   
-    private PlayerInput knightInput;
-    private PlayerInput vikingInput;
-    private PlayerInput ninjaInput;
+    public static InputManager Instance { get; private set; }
 
-    private InputAction knightMove, knightSpecial, ninjaMove;
-    private InputAction vikingMove, vikingSpecial, ninjaSpecial;
-    private InputAction knightAttack, vikingAttack, ninjaAttack;
-    private InputAction knightBlock, vikingBlock, ninjaBlock;
+    // ?? Private ???????????????????????????????????????????????
+    // Generic movement interface so we don't care which character it is
+    private MonoBehaviour p1Movement;
+    private MonoBehaviour p2Movement;
+    public bool inputEnabled = false;
+    private InputAction p1Move, p1Attack, p1Block, p1Jump;
+    private InputAction p2Move, p2Attack, p2Block, p2Jump;
 
-  
-    private PlayerInput soldierInput;
-    private InputAction soldierMove, soldierSpecial, soldierAttack, soldierBlock;
+    private bool isSetup = false;
 
-    private PlayerInput caveManInput;
-    private InputAction caveManMove, caveManSpecial, caveManAttack, caveManBlock;
     void Awake()
     {
-        knightInput = knight.GetComponent<PlayerInput>();
-        vikingInput = viking.GetComponent<PlayerInput>();
-        ninjaInput = ninja.GetComponent<PlayerInput>();
-        soldierInput = soldier.GetComponent<PlayerInput>();
-        caveManInput = caveMan.GetComponent<PlayerInput>();
-       
-   
-        // Knight reads from whichever action map is assigned
-        string knightMap = knight.isPlayer1 ? "Player1" : "Player2";
-        string vikingMap = viking.isPlayer1 ? "Player1" : "Player2";
-        string ninjaMap = ninja.isPlayer1 ? "Player1" : "Player2";
-        string soldierMap = soldier.isPlayer1 ? "Player1" : "Player2";
-        string caveManMap = caveMan.isPlayer1 ? "Player1" : "Player2";
-
-        knightMove = knightInput.actions.FindActionMap(knightMap).FindAction("Move");
-        ninjaSpecial = ninjaInput.actions.FindActionMap(ninjaMap).FindAction("Jump");
-        ninjaMove = ninjaInput.actions.FindActionMap(ninjaMap).FindAction("Move");
-        knightSpecial = knightInput.actions.FindActionMap(knightMap).FindAction("Jump");
-        vikingMove = vikingInput.actions.FindActionMap(vikingMap).FindAction("Move");
-        vikingSpecial = vikingInput.actions.FindActionMap(vikingMap).FindAction("Jump");
-        knightAttack = knightInput.actions.FindActionMap(knightMap).FindAction("Attack");
-        vikingAttack = vikingInput.actions.FindActionMap(vikingMap).FindAction("Attack");
-        ninjaAttack = ninjaInput.actions.FindActionMap(ninjaMap).FindAction("Attack");
-        knightBlock = knightInput.actions.FindActionMap(knightMap).FindAction("Block");
-        vikingBlock = vikingInput.actions.FindActionMap(vikingMap).FindAction("Block");
-        ninjaBlock = ninjaInput.actions.FindActionMap(ninjaMap).FindAction("Block");
-
-        soldierMove = soldierInput.actions.FindActionMap(soldierMap).FindAction("Move");
-        soldierSpecial = soldierInput.actions.FindActionMap(soldierMap).FindAction("Jump");
-        soldierAttack = soldierInput.actions.FindActionMap(soldierMap).FindAction("Attack");
-        soldierBlock = soldierInput.actions.FindActionMap(soldierMap).FindAction("Block");
-
-        caveManMove = caveManInput.actions.FindActionMap(caveManMap).FindAction("Move");
-        caveManSpecial = caveManInput.actions.FindActionMap(caveManMap).FindAction("Jump");
-        caveManAttack = caveManInput.actions.FindActionMap(caveManMap).FindAction("Attack");
-        caveManBlock = caveManInput.actions.FindActionMap(caveManMap).FindAction("Block");
+        Instance = this;
     }
 
-    void OnEnable()
+    // ?? Called by GameManager after spawning both players ??????
+    public void SetPlayers(GameObject p1, GameObject p2)
     {
-        knightMove.Enable(); knightSpecial.Enable();
-        vikingMove.Enable(); vikingSpecial.Enable();
-        knightAttack.Enable();
-        vikingAttack.Enable();
-        ninjaMove.Enable(); ninjaSpecial.Enable();
-        ninjaAttack.Enable();
-        knightSpecial.performed += OnKnightJump;
-        vikingSpecial.performed += OnVikingJump;
-        knightAttack.performed += OnKnightAttack;
-        vikingAttack.performed += OnVikingAttack;
-        ninjaSpecial.performed += OnNinjaJump;
-        ninjaAttack.performed += OnNinjaAttack;
+        // Grab whichever movement script is on each spawned character
+        p1Movement = GetMovement(p1);
+        p2Movement = GetMovement(p2);
 
-        knightBlock.Enable();
-        vikingBlock.Enable();
-        ninjaBlock.Enable();
-        knightBlock.started += OnKnightBlockStart;
-        knightBlock.canceled += OnKnightBlockEnd;
-        vikingBlock.started += OnVikingBlockStart;
-        vikingBlock.canceled += OnVikingBlockEnd;
-        ninjaBlock.started += OnNinjaBlockStart;
-        ninjaBlock.canceled += OnNinjaBlockEnd;
+        if (p1Movement == null) { Debug.LogError("No movement script found on Player 1!"); return; }
+        if (p2Movement == null) { Debug.LogError("No movement script found on Player 2!"); return; }
 
-        soldierMove.Enable(); soldierSpecial.Enable();
-        soldierAttack.Enable(); soldierBlock.Enable();
-        soldierSpecial.performed += OnSoldierJump;
-        soldierAttack.performed += OnSoldierAttack;
-        soldierBlock.started += OnSoldierBlockStart;
-        soldierBlock.canceled += OnSoldierBlockEnd;
+        // Grab PlayerInput components
+        PlayerInput p1Input = p1.GetComponent<PlayerInput>();
+        PlayerInput p2Input = p2.GetComponent<PlayerInput>();
 
-        caveManMove.Enable(); caveManSpecial.Enable();
-        caveManAttack.Enable(); caveManBlock.Enable();
-        caveManSpecial.performed += OnCaveManJump;
-        caveManAttack.performed += OnCaveManAttack;
-        caveManBlock.started += OnCaveManBlockStart;
-        caveManBlock.canceled += OnCaveManBlockEnd;
+        if (p1Input == null) { Debug.LogError("No PlayerInput on Player 1!"); return; }
+        if (p2Input == null) { Debug.LogError("No PlayerInput on Player 2!"); return; }
+
+        // Always use Player1 map for p1 and Player2 map for p2
+        var p1Map = p1Input.actions.FindActionMap("Player1");
+        var p2Map = p2Input.actions.FindActionMap("Player2");
+
+        p1Move = p1Map.FindAction("Move");
+        p1Attack = p1Map.FindAction("Attack");
+        p1Block = p1Map.FindAction("Block");
+        p1Jump = p1Map.FindAction("Jump");
+
+        p2Move = p2Map.FindAction("Move");
+        p2Attack = p2Map.FindAction("Attack");
+        p2Block = p2Map.FindAction("Block");
+        p2Jump = p2Map.FindAction("Jump");
+
+        // Enable all actions
+        p1Move.Enable(); p1Attack.Enable(); p1Block.Enable(); p1Jump.Enable();
+        p2Move.Enable(); p2Attack.Enable(); p2Block.Enable(); p2Jump.Enable();
+
+        // Hook up events
+        p1Attack.performed += OnP1Attack;
+        p1Jump.performed += OnP1Jump;
+        p1Block.started += OnP1BlockStart;
+        p1Block.canceled += OnP1BlockEnd;
+
+        p2Attack.performed += OnP2Attack;
+        p2Jump.performed += OnP2Jump;
+        p2Block.started += OnP2BlockStart;
+        p2Block.canceled += OnP2BlockEnd;
+
+        isSetup = true;
+    }
+
+    void Update()
+    {
+        if (!isSetup || !inputEnabled) return;
+
+        // Feed movement every frame
+        if (p1Movement != null && p1Movement.gameObject.activeInHierarchy)
+            CallSetMoveInput(p1Movement, p1Move.ReadValue<float>());
+
+        if (p2Movement != null && p2Movement.gameObject.activeInHierarchy)
+            CallSetMoveInput(p2Movement, p2Move.ReadValue<float>());
+
+        UpdateFacing();
+    }
+
+    // ?? Input callbacks ????????????????????????????????????????
+    void OnP1Attack(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p1Movement)) CallTriggerAttack(p1Movement);
+    }
+    void OnP2Attack(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p2Movement)) CallTriggerAttack(p2Movement);
+    }
+
+    void OnP1Jump(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p1Movement)) CallOnSpecial(p1Movement);
+    }
+    void OnP2Jump(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p2Movement)) CallOnSpecial(p2Movement);
+    }
+
+    void OnP1BlockStart(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p1Movement)) CallStartBlock(p1Movement);
+    }
+    void OnP1BlockEnd(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p1Movement)) CallEndBlock(p1Movement);
+    }
+    void OnP2BlockStart(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p2Movement)) CallStartBlock(p2Movement);
+    }
+    void OnP2BlockEnd(InputAction.CallbackContext ctx)
+    {
+        if (!inputEnabled) return;
+        if (IsActive(p2Movement)) CallEndBlock(p2Movement);
+    }
+
+    // ?? Facing update ??????????????????????????????????????????
+    void UpdateFacing()
+    {
+        if (p1Movement == null || p2Movement == null) return;
+        if (!p1Movement.gameObject.activeInHierarchy) return;
+        if (!p2Movement.gameObject.activeInHierarchy) return;
+
+        Transform t1 = p1Movement.transform;
+        Transform t2 = p2Movement.transform;
+
+        Transform left = t1.position.x < t2.position.x ? t1 : t2;
+        Transform right = t1.position.x < t2.position.x ? t2 : t1;
+
+        left.localScale = new Vector3(Mathf.Abs(left.localScale.x), left.localScale.y, left.localScale.z);
+        right.localScale = new Vector3(-Mathf.Abs(right.localScale.x), right.localScale.y, right.localScale.z);
+    }
+
+    // ?? Helpers ????????????????????????????????????????????????
+    // Gets whichever movement script exists on the GameObject
+    MonoBehaviour GetMovement(GameObject go)
+    {
+        MonoBehaviour m;
+        m = go.GetComponent<KnightMovement>(); if (m != null) return m;
+        m = go.GetComponent<VikingMovement>(); if (m != null) return m;
+        m = go.GetComponent<NinjaMovement>(); if (m != null) return m;
+        m = go.GetComponent<SoldierMovement>(); if (m != null) return m;
+        m = go.GetComponent<CaveManMovement>(); if (m != null) return m;
+        return null;
+    }
+
+    bool IsActive(MonoBehaviour m) => m != null && m.gameObject.activeInHierarchy;
+
+    void CallSetMoveInput(MonoBehaviour m, float value)
+    {
+        if (m is KnightMovement k) k.SetMoveInput(value);
+        else if (m is VikingMovement v) v.SetMoveInput(value);
+        else if (m is NinjaMovement n) n.SetMoveInput(value);
+        else if (m is SoldierMovement s) s.SetMoveInput(value);
+        else if (m is CaveManMovement c) c.SetMoveInput(value);
+    }
+
+    void CallTriggerAttack(MonoBehaviour m)
+    {
+        if (m is KnightMovement k) k.TriggerAttack();
+        else if (m is VikingMovement v) v.TriggerAttack();
+        else if (m is NinjaMovement n) n.TriggerAttack();
+        else if (m is SoldierMovement s) s.TriggerAttack();
+        else if (m is CaveManMovement c) c.TriggerAttack();
+    }
+
+    void CallOnSpecial(MonoBehaviour m)
+    {
+        if (m is KnightMovement k) k.OnSpecialPerformed();
+        else if (m is VikingMovement v) v.OnSpecialPerformed();
+        else if (m is NinjaMovement n) n.OnSpecialPerformed();
+        else if (m is SoldierMovement s) s.OnSpecialPerformed();
+        else if (m is CaveManMovement c) c.OnSpecialPerformed();
+    }
+
+    void CallStartBlock(MonoBehaviour m)
+    {
+        if (m is KnightMovement k) k.StartBlock();
+        else if (m is VikingMovement v) v.StartBlock();
+        else if (m is NinjaMovement n) n.StartBlock();
+        else if (m is SoldierMovement s) s.StartBlock();
+        else if (m is CaveManMovement c) c.StartBlock();
+    }
+
+    void CallEndBlock(MonoBehaviour m)
+    {
+        if (m is KnightMovement k) k.EndBlock();
+        else if (m is VikingMovement v) v.EndBlock();
+        else if (m is NinjaMovement n) n.EndBlock();
+        else if (m is SoldierMovement s) s.EndBlock();
+        else if (m is CaveManMovement c) c.EndBlock();
     }
 
     void OnDisable()
     {
-        knightSpecial.performed -= OnKnightJump;
-        vikingSpecial.performed -= OnVikingJump;
-        knightAttack.performed -= OnKnightAttack;
-        vikingAttack.performed -= OnVikingAttack;
-        ninjaSpecial.performed -= OnNinjaJump;
-        ninjaAttack.performed  -= OnNinjaAttack;
-        knightMove.Disable(); knightSpecial.Disable();
-        vikingMove.Disable(); vikingSpecial.Disable();
-        knightAttack.Disable();
-        vikingAttack.Disable();
-        ninjaMove.Disable(); ninjaSpecial.Disable();
-        ninjaAttack.Disable();
+        if (!isSetup) return;
 
-        knightBlock.started -= OnKnightBlockStart;
-        knightBlock.canceled -= OnKnightBlockEnd;
-        vikingBlock.started -= OnVikingBlockStart;
-        vikingBlock.canceled -= OnVikingBlockEnd;
-        ninjaBlock.started  -= OnNinjaBlockStart;
-        ninjaBlock.canceled -= OnNinjaBlockEnd;
-        knightBlock.Disable();
-        vikingBlock.Disable();
-        ninjaBlock.Disable();
+        p1Attack.performed -= OnP1Attack;
+        p1Jump.performed -= OnP1Jump;
+        p1Block.started -= OnP1BlockStart;
+        p1Block.canceled -= OnP1BlockEnd;
 
-        soldierSpecial.performed -= OnSoldierJump;
-        soldierAttack.performed -= OnSoldierAttack;
-        soldierBlock.started -= OnSoldierBlockStart;
-        soldierBlock.canceled -= OnSoldierBlockEnd;
-        soldierMove.Disable(); soldierSpecial.Disable();
-        soldierAttack.Disable(); soldierBlock.Disable();
+        p2Attack.performed -= OnP2Attack;
+        p2Jump.performed -= OnP2Jump;
+        p2Block.started -= OnP2BlockStart;
+        p2Block.canceled -= OnP2BlockEnd;
 
-        caveManSpecial.performed -= OnCaveManJump;
-        caveManAttack.performed -= OnCaveManAttack;
-        caveManBlock.started -= OnCaveManBlockStart;
-        caveManBlock.canceled -= OnCaveManBlockEnd;
-        caveManMove.Disable(); caveManSpecial.Disable();
-        caveManAttack.Disable(); caveManBlock.Disable();
-    }
-
-    void OnKnightJump(InputAction.CallbackContext ctx) { if (knight != null && knight.gameObject.activeInHierarchy) knight.OnSpecialPerformed(); }
-    void OnVikingJump(InputAction.CallbackContext ctx) { if (viking != null && viking.gameObject.activeInHierarchy) viking.OnSpecialPerformed(); }
-    void OnNinjaJump(InputAction.CallbackContext ctx) { if (ninja != null && ninja.gameObject.activeInHierarchy) ninja.OnSpecialPerformed(); }
-
-    void OnKnightAttack(InputAction.CallbackContext ctx) { if (knight != null && knight.gameObject.activeInHierarchy) knight.TriggerAttack(); }
-    void OnVikingAttack(InputAction.CallbackContext ctx) { if (viking != null && viking.gameObject.activeInHierarchy) viking.TriggerAttack(); }
-    void OnNinjaAttack(InputAction.CallbackContext ctx) { if (ninja != null && ninja.gameObject.activeInHierarchy) ninja.TriggerAttack(); }
-
-    void OnKnightBlockStart(InputAction.CallbackContext ctx) { if (knight != null && knight.gameObject.activeInHierarchy) knight.StartBlock(); }
-    void OnKnightBlockEnd(InputAction.CallbackContext ctx) { if (knight != null && knight.gameObject.activeInHierarchy) knight.EndBlock(); }
-    void OnVikingBlockStart(InputAction.CallbackContext ctx) { if (viking != null && viking.gameObject.activeInHierarchy) viking.StartBlock(); }
-    void OnVikingBlockEnd(InputAction.CallbackContext ctx) { if (viking != null && viking.gameObject.activeInHierarchy) viking.EndBlock(); }
-    void OnNinjaBlockStart(InputAction.CallbackContext ctx) { if (ninja != null && ninja.gameObject.activeInHierarchy) ninja.StartBlock(); }
-    void OnNinjaBlockEnd(InputAction.CallbackContext ctx) { if (ninja != null && ninja.gameObject.activeInHierarchy) ninja.EndBlock(); }
-
-    void OnSoldierJump(InputAction.CallbackContext ctx) { if (soldier != null && soldier.gameObject.activeInHierarchy) soldier.OnSpecialPerformed(); }
-    void OnSoldierAttack(InputAction.CallbackContext ctx) { if (soldier != null && soldier.gameObject.activeInHierarchy) soldier.TriggerAttack(); }
-    void OnSoldierBlockStart(InputAction.CallbackContext ctx) { if (soldier != null && soldier.gameObject.activeInHierarchy) soldier.StartBlock(); }
-    void OnSoldierBlockEnd(InputAction.CallbackContext ctx) { if (soldier != null && soldier.gameObject.activeInHierarchy) soldier.EndBlock(); }
-    void OnCaveManJump(InputAction.CallbackContext ctx) { if (caveMan != null && caveMan.gameObject.activeInHierarchy) caveMan.OnSpecialPerformed(); }
-    void OnCaveManAttack(InputAction.CallbackContext ctx) { if (caveMan != null && caveMan.gameObject.activeInHierarchy) caveMan.TriggerAttack(); }
-    void OnCaveManBlockStart(InputAction.CallbackContext ctx) { if (caveMan != null && caveMan.gameObject.activeInHierarchy) caveMan.StartBlock(); }
-    void OnCaveManBlockEnd(InputAction.CallbackContext ctx) { if (caveMan != null && caveMan.gameObject.activeInHierarchy) caveMan.EndBlock(); }
-    void Update()
-    {
-        if (knight != null && knight.gameObject.activeInHierarchy)
-            knight.SetMoveInput(knightMove.ReadValue<float>());
-        if (viking != null && viking.gameObject.activeInHierarchy)
-            viking.SetMoveInput(vikingMove.ReadValue<float>());
-        if (ninja != null && ninja.gameObject.activeInHierarchy)
-            ninja.SetMoveInput(ninjaMove.ReadValue<float>());
-        if (soldier != null && soldier.gameObject.activeInHierarchy)
-            soldier.SetMoveInput(soldierMove.ReadValue<float>());
-        if (caveMan != null && caveMan.gameObject.activeInHierarchy)
-            caveMan.SetMoveInput(caveManMove.ReadValue<float>());
-        UpdateFacing();
-    }
-
-    void UpdateFacing()
-    {
-        // collect active characters
-        Transform p1 = null, p2 = null;
-
-        if (knight != null && knight.gameObject.activeInHierarchy)
-            AssignPlayers(knight.transform, ref p1, ref p2);
-        if (viking != null && viking.gameObject.activeInHierarchy)
-            AssignPlayers(viking.transform, ref p1, ref p2);
-        if (ninja != null && ninja.gameObject.activeInHierarchy)
-            AssignPlayers(ninja.transform, ref p1, ref p2);
-        if (soldier != null && soldier.gameObject.activeInHierarchy)
-            AssignPlayers(soldier.transform, ref p1, ref p2);
-        if (caveMan != null && caveMan.gameObject.activeInHierarchy)
-            AssignPlayers(caveMan.transform, ref p1, ref p2);
-
-        if (p1 == null || p2 == null) return;
-
-        // whoever is on the left faces right, whoever is on the right faces left
-        Transform leftPlayer = p1.position.x < p2.position.x ? p1 : p2;
-        Transform rightPlayer = p1.position.x < p2.position.x ? p2 : p1;
-
-        leftPlayer.localScale = new Vector3(1f, 1f, 1f);
-        rightPlayer.localScale = new Vector3(-1f, 1f, 1f);
-    }
-
-    void AssignPlayers(Transform t, ref Transform p1, ref Transform p2)
-    {
-        if (p1 == null) p1 = t;
-        else if (p2 == null) p2 = t;
+        p1Move.Disable(); p1Attack.Disable(); p1Block.Disable(); p1Jump.Disable();
+        p2Move.Disable(); p2Attack.Disable(); p2Block.Disable(); p2Jump.Disable();
     }
 }
