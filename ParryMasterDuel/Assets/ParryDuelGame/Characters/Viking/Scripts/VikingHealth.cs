@@ -5,6 +5,7 @@ public class VikingHealth : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
+
     public float CurrentHealth => currentHealth;
     [Header("Knockback")]
     public float knockbackForce = 5f;
@@ -76,6 +77,12 @@ public class VikingHealth : MonoBehaviour
             {
                 attackerninja.TriggerParryStun(transform.position);
                 attackerninja.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
+            VikingMovement attackerViking2 = FindAttacker<VikingMovement>(attackerPosition);
+            if (attackerViking2 != null && attackerViking2 != movement)
+            {
+                attackerViking2.TriggerParryStun(transform.position);
+                attackerViking2.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
             SoldierMovement attackersoldier = FindAttacker<SoldierMovement>(attackerPosition);
             if (attackersoldier != null)

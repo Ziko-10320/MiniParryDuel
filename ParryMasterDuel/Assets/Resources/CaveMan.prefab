@@ -370,7 +370,9 @@ MonoBehaviour:
   jumpClip: {fileID: 8300000, guid: 4339585a378434548a6b19221b407063, type: 3}
   rollSounds:
   - {fileID: 8300000, guid: e701cdc4a61fda843b14e7a0e74c1430, type: 3}
-  attackSounds: []
+  attackSounds:
+  - {fileID: 8300000, guid: 915b9adda07a82d41955726f38b222aa, type: 3}
+  boomerangLoopClip: {fileID: 8300000, guid: 649881c75d732474d8fdcba14eaa2be7, type: 3}
   canJump: 1
   jumpForce: 20
   groundLayer:

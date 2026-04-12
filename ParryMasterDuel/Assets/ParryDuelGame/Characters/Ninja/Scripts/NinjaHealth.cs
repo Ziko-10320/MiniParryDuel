@@ -72,6 +72,12 @@ public class NinjaHealth : MonoBehaviour
                 attacker.TriggerParryStun(transform.position);
                 attacker.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            NinjaMovement attackerNinja = FindAttacker<NinjaMovement>(attackerPosition);
+            if (attackerNinja != null && attackerNinja != movement)
+            {
+                attackerNinja.TriggerParryStun(transform.position);
+                attackerNinja.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
             VikingMovement attackerviking = FindAttacker<VikingMovement>(attackerPosition);
             if (attackerviking != null)
             {

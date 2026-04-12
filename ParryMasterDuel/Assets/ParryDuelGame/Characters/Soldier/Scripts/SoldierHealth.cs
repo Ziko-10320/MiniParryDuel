@@ -84,6 +84,12 @@ public class SoldierHealth : MonoBehaviour
                 attackerK.TriggerParryStun(transform.position);
                 attackerK.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            SoldierMovement attackerSoldier2 = FindAttacker<SoldierMovement>(attackerPosition);
+            if (attackerSoldier2 != null && attackerSoldier2 != movement)
+            {
+                attackerSoldier2.TriggerParryStun(transform.position);
+                attackerSoldier2.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
             CaveManMovement attackerCM = FindAttacker<CaveManMovement>(attackerPosition);
             if (attackerCM != null)
             {

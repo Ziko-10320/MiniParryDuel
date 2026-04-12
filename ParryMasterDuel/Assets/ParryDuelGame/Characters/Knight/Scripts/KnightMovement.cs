@@ -11,14 +11,15 @@ public class KnightMovement : MonoBehaviour, IFinishable
     public AudioClip[] attackSounds;
     [Header("Movement")]
     public float moveSpeed = 6f;
-
+    public float CurrentPosture => currentPosture;
     [Header("Jump")]
     public bool canJump = false;
     public float jumpForce = 12f;
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-
+    private float postureRegenDelay = 0f;
+    public float postureRegenWaitTime = 2f;
     [Header("Roll")]
     public float rollSpeed = 12f;
     public float rollDuration = 0.4f;
@@ -43,7 +44,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
     private float moveInput;
     private bool isGrounded;
 
-  
+
     [Header("Attack")]
     public Transform attackPoint;
     public Vector2 attackBox = new Vector2(1f, 1f);
@@ -51,7 +52,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
     public LayerMask enemyLayer;
 
     private bool isAttacking;
-    public ShakeData CameraShake ;
+    public ShakeData CameraShake;
     public ShakeData CameraShakeheavy;
 
     [Header("Block")]
@@ -78,7 +79,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
     public Transform parryVFXSpawnPoint;
     public float knockbackForce = 2f;
     private bool isInParryWindow;
-    private float parryWindowTimer; 
+    private float parryWindowTimer;
     public bool IsInParryWindow() => isInParryWindow && !isStunned;
 
     [Header("Lunge")]
@@ -105,13 +106,13 @@ public class KnightMovement : MonoBehaviour, IFinishable
         ghostTrail = GetComponent<GhostTrail>();
     }
 
- 
+
     void Update()
     {
         if (isFinishable) return;
         // Ground check
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-       
+
         if (isRolling)
         {
             rollTimer -= Time.deltaTime;
@@ -128,16 +129,21 @@ public class KnightMovement : MonoBehaviour, IFinishable
         if (isStunned)
         {
             stunTimer -= Time.deltaTime;
+            // regen posture from 0 to full during stun duration
+            currentPosture = Mathf.Lerp(0f, maxPosture, 1f - (stunTimer / stunDuration));
             if (stunTimer <= 0f)
             {
                 isStunned = false;
+                currentPosture = maxPosture;
                 animator.SetBool("isStunned", false);
             }
             return;
         }
 
         // Posture regen when not blocking
-        if (!isBlocking && currentPosture < maxPosture)
+        if (postureRegenDelay > 0f)
+            postureRegenDelay -= Time.deltaTime;
+        else if (!isBlocking && !isStunned && currentPosture < maxPosture)
             currentPosture += postureRegen * Time.deltaTime;
         if (isInParryWindow)
         {
@@ -173,7 +179,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
         if (isBlocking) return;
         if (GetComponent<KnightHealth>().IsKnockedBack) return;
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-      
+
     }
     public void SetMoveInput(float value)
     {
@@ -255,7 +261,13 @@ public class KnightMovement : MonoBehaviour, IFinishable
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         if (jumpClip != null) audioSource.PlayOneShot(jumpClip);
     }
-
+    public void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
     public void OnSpecialPerformed()
     {
         if (isFinishable) return;
@@ -309,7 +321,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
     }
     public void CameraShakeHeavy()
     {
-        CameraShakerHandler.Shake( CameraShakeheavy);
+        CameraShakerHandler.Shake(CameraShakeheavy);
     }
 
     public void StartBlock(bool ignoreParryCooldown = false)
@@ -342,7 +354,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
         // Spawn sparks
         if (blockSparksPrefab != null && blockSparksSpawnPoint != null)
             Instantiate(blockSparksPrefab, blockSparksSpawnPoint.position, Quaternion.identity);
-
+        postureRegenDelay = postureRegenWaitTime;
         currentPosture -= damage;
         CameraShakerHandler.Shake(CameraShake);
         if (currentPosture <= 0f)
@@ -354,19 +366,26 @@ public class KnightMovement : MonoBehaviour, IFinishable
     }
     public void TriggerParryStun(Vector2 attackerPosition)
     {
-        isStunned = true;
-        isBlocking = false;
-        stunTimer = parryStunDuration;
-        animator.SetTrigger("EndBlock");
-        animator.SetBool("isStunned", true);
-        animator.SetTrigger("GetParried");
-
+        // knockback and animation always happen on parry
         Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+        animator.SetTrigger("GetParried");
+
+        // stun only when posture fully depleted
+        if (currentPosture <= 0f)
+        {
+            isStunned = true;
+            isBlocking = false;
+            stunTimer = stunDuration;
+            animator.SetTrigger("EndBlock");
+           
+            animator.SetBool("isStunned", true);
+        }
     }
     public void ReceiveParryPostureDamage(float damage)
     {
+        postureRegenDelay = postureRegenWaitTime;
         currentPosture -= damage;
         if (currentPosture <= 0f)
         {
@@ -380,6 +399,7 @@ public class KnightMovement : MonoBehaviour, IFinishable
         isBlocking = false;
         stunTimer = stunDuration;
         animator.SetTrigger("EndBlock");
+        animator.SetTrigger("GetParried");
         animator.SetBool("isStunned", true);
         GetComponent<KnightHealth>()?.CheckFinishable();
     }

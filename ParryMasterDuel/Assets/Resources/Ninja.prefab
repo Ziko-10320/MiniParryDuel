@@ -944,6 +944,7 @@ MonoBehaviour:
   knockbackDuration: 0.2
   bloodPrefab: {fileID: 3847384204462952536, guid: b505d72260b1a4e42bc4fbff0989ef67, type: 3}
   bloodSpawnPoint: {fileID: 8393408741825653337}
+  parryPostureDamage: 30
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
   CameraShakeParry: {fileID: 11400000, guid: efa127c7cb28a15418d24a7fdea516f5, type: 2}
 --- !u!82 &7758967372496850661

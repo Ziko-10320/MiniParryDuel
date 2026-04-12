@@ -78,6 +78,12 @@ public class CaveManHealth : MonoBehaviour
                 attackerninja.TriggerParryStun(transform.position);
                 attackerninja.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            CaveManMovement attackerCM = FindAttacker<CaveManMovement>(attackerPosition);
+            if (attackerCM != null)
+            {
+                attackerCM.TriggerParryStun(transform.position);
+                attackerCM.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
             SoldierMovement attackersoldier = FindAttacker<SoldierMovement>(attackerPosition);
             if (attackersoldier != null)
             {

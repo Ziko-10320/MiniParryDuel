@@ -17,6 +17,9 @@ public class VikingMovement : MonoBehaviour, IFinishable
     public LayerMask groundLayer;
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+    private float postureRegenDelay = 0f;
+    public float postureRegenWaitTime = 2f;
+    public float CurrentPosture => currentPosture;
     private bool isRunning;
     [Header("Roll")]
     public float rollSpeed = 12f;
@@ -129,16 +132,20 @@ public class VikingMovement : MonoBehaviour, IFinishable
         if (isStunned)
         {
             stunTimer -= Time.deltaTime;
+            currentPosture = Mathf.Lerp(0f, maxPosture, 1f - (stunTimer / stunDuration));
             if (stunTimer <= 0f)
             {
                 isStunned = false;
+                currentPosture = maxPosture;
                 animator.SetBool("isStunned", false);
             }
             return;
         }
 
         // Posture regen when not blocking
-        if (!isBlocking && currentPosture < maxPosture)
+        if (postureRegenDelay > 0f)
+            postureRegenDelay -= Time.deltaTime;
+        else if (!isBlocking && !isStunned && currentPosture < maxPosture)
             currentPosture += postureRegen * Time.deltaTime;
         if (isInParryWindow)
         {
@@ -257,7 +264,13 @@ public class VikingMovement : MonoBehaviour, IFinishable
         if (isFinishable) return;
         if (canJump) TryJump();
     }
-
+    public void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
     public void TriggerAttack()
     {
         if (isFinishable) return;
@@ -335,6 +348,7 @@ public class VikingMovement : MonoBehaviour, IFinishable
 
     public void AbsorbBlockedHit(float damage, Vector2 attackerPosition)
     {
+        postureRegenDelay = postureRegenWaitTime;
         // Spawn sparks
         if (blockSparksPrefab != null && blockSparksSpawnPoint != null)
             Instantiate(blockSparksPrefab, blockSparksSpawnPoint.position, Quaternion.identity);
@@ -350,19 +364,23 @@ public class VikingMovement : MonoBehaviour, IFinishable
     }
     public void TriggerParryStun(Vector2 attackerPosition)
     {
-        isStunned = true;
-        isBlocking = false;
-        stunTimer = parryStunDuration;
-        animator.SetTrigger("EndBlock");
-        animator.SetBool("isStunned", true);
-        animator.SetTrigger("GetParried");
-
         Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+        animator.SetTrigger("GetParried");
+
+        if (currentPosture <= 0f)
+        {
+            isStunned = true;
+            isBlocking = false;
+            stunTimer = stunDuration;
+            animator.SetTrigger("EndBlock");
+            animator.SetBool("isStunned", true);
+        }
     }
     public void ReceiveParryPostureDamage(float damage)
     {
+        postureRegenDelay = postureRegenWaitTime;
         currentPosture -= damage;
         if (currentPosture <= 0f)
         {
@@ -375,6 +393,7 @@ public class VikingMovement : MonoBehaviour, IFinishable
         isBlocking = false;
         stunTimer = stunDuration;
         animator.SetTrigger("EndBlock");
+        animator.SetTrigger("GetStunned");
         animator.SetBool("isStunned", true);
         GetComponent<VikingHealth>()?.CheckFinishable(); // was wrongly calling NinjaHealth before
     }

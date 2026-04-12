@@ -21,10 +21,12 @@ public class GameManager : MonoBehaviour
     public Sprite[] characterPortraits;
     [Header("Camera")]
     public CameraController cameraController;
-
+    [Header("Backgrounds")]
+    public GameObject[] skies;
     [Header("Countdown UI")]
     public TextMeshProUGUI countdownText;
-
+    [Header("Environment")] // <-- ADD THIS
+    public AudioClip environmentLoop;
     [Header("Result UI")]
     public TextMeshProUGUI resultText;
 
@@ -56,10 +58,17 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        AudioSource audioSource = GetComponent<AudioSource>();
+        if (audioSource != null && environmentLoop != null)
+        {
+            audioSource.clip = environmentLoop;
+            audioSource.Play();
+        }
     }
 
     void Start()
     {
+        SelectRandomSky();
         if (endPanel != null) endPanel.SetActive(false);
         if (pausePanel != null) pausePanel.SetActive(false);
         if (resultText != null) resultText.gameObject.SetActive(false);
@@ -135,7 +144,27 @@ public class GameManager : MonoBehaviour
         SetPlayersInputEnabled(true);
         gameStarted = true;
     }
+    void SelectRandomSky()
+    {
+        // First, make sure the list isn't empty
+        if (skies == null || skies.Length == 0)
+        {
+            Debug.LogWarning("Skies list is empty! Cannot select a random sky.");
+            return;
+        }
 
+        // 1. Disable all skies first to ensure a clean state
+        foreach (GameObject sky in skies)
+        {
+            sky.SetActive(false);
+        }
+
+        // 2. Pick a random index from the list
+        int randomIndex = Random.Range(0, skies.Length);
+
+        // 3. Enable the randomly chosen sky
+        skies[randomIndex].SetActive(true);
+    }
     public void OnPlayerFinishable(GameObject player)
     {
         if (gameOver) return;

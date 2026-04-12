@@ -10,6 +10,8 @@ public class KnightHealth : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
+    
+  
     public float CurrentHealth => currentHealth;
     [Header("Knockback")]
     public float knockbackForce = 5f;
@@ -24,6 +26,7 @@ public class KnightHealth : MonoBehaviour
     private bool isKnockedBack;
     private float knockbackTimer;
     public ShakeData CameraShake;
+   
     public bool IsKnockedBack => isKnockedBack;
     private KnightMovement movement;
     public ShakeData CameraShakeParry;
@@ -73,12 +76,19 @@ public class KnightHealth : MonoBehaviour
                 attacker.TriggerParryStun(transform.position);
                 attacker.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+            KnightMovement attackerKnight = FindAttacker<KnightMovement>(attackerPosition);
+            if (attackerKnight != null && attackerKnight != movement)
+            {
+                attackerKnight.TriggerParryStun(transform.position);
+                attackerKnight.ReceiveParryPostureDamage(movement.parryPostureDamage);
+            }
             NinjaMovement attackerninja = FindAttacker<NinjaMovement>(attackerPosition);
             if (attackerninja != null)
             {
                 attackerninja.TriggerParryStun(transform.position);
                 attackerninja.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
+           
             SoldierMovement attackersoldier = FindAttacker<SoldierMovement>(attackerPosition);
             if (attackersoldier != null)
             {
@@ -144,7 +154,7 @@ public class KnightHealth : MonoBehaviour
         if (isFinishable) return;
         isFinishable = true;
         movement.EnterFinishableState();
-       
+
 
     }
     public void CheckFinishable()

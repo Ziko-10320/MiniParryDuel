@@ -699,8 +699,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287532686
-  m_fontColor: {r: 0.5568628, g: 0.5568628, b: 0.5568628, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1250,11 +1250,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonScaler
   hoverScale: 1.1
-  pressedScale: 1
+  pressedScale: 1.05
   scaleSpeed: 15
-  hoverSound: {fileID: 8300000, guid: 17cb0dd45b90e594d973445f1427d792, type: 3}
-  clickSound: {fileID: 8300000, guid: 6c7746176ab141349a3ff32813ee86be, type: 3}
-  soundVolume: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 8300000, guid: 17cb0dd45b90e594d973445f1427d792, type: 3}
+  soundVolume: 0.5
 --- !u!114 &671160822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1267,7 +1267,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.5566038, g: 0.5566038, b: 0.5566038, a: 1}
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
   m_EffectDistance: {x: 3, y: 3}
   m_UseGraphicAlpha: 1
 --- !u!1 &678609579
@@ -2388,8 +2388,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287532686
-  m_fontColor: {r: 0.5568628, g: 0.5568628, b: 0.5568628, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3260,11 +3260,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonScaler
   hoverScale: 1.1
-  pressedScale: 1
+  pressedScale: 1.05
   scaleSpeed: 15
-  hoverSound: {fileID: 8300000, guid: 17cb0dd45b90e594d973445f1427d792, type: 3}
-  clickSound: {fileID: 8300000, guid: 6c7746176ab141349a3ff32813ee86be, type: 3}
-  soundVolume: 1
+  hoverSound: {fileID: 0}
+  clickSound: {fileID: 8300000, guid: 17cb0dd45b90e594d973445f1427d792, type: 3}
+  soundVolume: 0.5
 --- !u!114 &1939618335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3277,7 +3277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.5568628, g: 0.5568628, b: 0.5568628, a: 1}
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 1}
   m_EffectDistance: {x: 3, y: 3}
   m_UseGraphicAlpha: 1
 --- !u!1 &1970373210
@@ -3511,6 +3511,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2136722340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2136722342}
+  - component: {fileID: 2136722341}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2136722341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136722340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f3c8e93f480a0347b8e408aeaf4e279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicManager
+  menuMusic: {fileID: 0}
+  fadeDuration: 1
+--- !u!4 &2136722342
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136722340}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 754.3081, y: 641.80255, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3519,3 +3565,4 @@ SceneRoots:
   - {fileID: 1487279617}
   - {fileID: 2083145484}
   - {fileID: 579639015}
+  - {fileID: 2136722342}
