@@ -691,6 +691,7 @@ MonoBehaviour:
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}
   blockSparksSpawnPoint: {fileID: 1199490124093898291}
+  postureRegenWaitTime: 2
   blockCooldown: 0.5
   parryWindow: 0.2
   parryStunDuration: 0.5
@@ -720,6 +721,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoldierHealth
   maxHealth: 100
   knockbackForce: 7
+  isPlayer1: 0
   knockbackDuration: 0.2
   audioSource: {fileID: 1919983622825620965}
   hitSounds:

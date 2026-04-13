@@ -202,6 +202,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheck: {fileID: 629655314938597898}
   groundCheckRadius: 0.2
+  postureRegenWaitTime: 2
   rollSpeed: 16
   rollDuration: 0.4
   doubleTapWindow: 0.3
@@ -299,13 +300,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8b7109e2fe2e68446bcd699e789fb2c1, type: 3}
   - {fileID: 8300000, guid: 56364d6ac548f9f4ab7d40f7a333eb90, type: 3}
   maxHealth: 100
+  isPlayer1: 0
   knockbackForce: 7
   knockbackDuration: 0.2
   bloodPrefab: {fileID: 3847384204462952536, guid: b505d72260b1a4e42bc4fbff0989ef67, type: 3}
   bloodSpawnPoint: {fileID: 6536046365021094902}
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
-  parryPostureDamage: 30
-  postureStunDuration: 0
   CameraShakeParry: {fileID: 11400000, guid: efa127c7cb28a15418d24a7fdea516f5, type: 2}
 --- !u!114 &7345806713132092758
 MonoBehaviour:
