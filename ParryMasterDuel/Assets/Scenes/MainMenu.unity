@@ -3540,7 +3540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f3c8e93f480a0347b8e408aeaf4e279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
-  menuMusic: {fileID: 0}
+  menuMusic: {fileID: 8300000, guid: a6170ca422abc3b4090ac4f7f2e1a684, type: 3}
   fadeDuration: 1
 --- !u!4 &2136722342
 Transform:

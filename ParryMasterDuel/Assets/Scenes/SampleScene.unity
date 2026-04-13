@@ -7538,7 +7538,7 @@ MonoBehaviour:
   - {fileID: 461934227}
   - {fileID: 2129309598}
   countdownText: {fileID: 1590026703}
-  environmentLoop: {fileID: 8300000, guid: bff76c0a99e86a447bf407898fb76c9f, type: 3}
+  environmentLoop: {fileID: 8300000, guid: 9a5590dbc22af0c4eaa85db375b17c05, type: 3}
   resultText: {fileID: 279928809}
   popupCanvasYOffset: 1.5
   endPanel: {fileID: 54477996}
@@ -27318,6 +27318,7 @@ GameObject:
   - component: {fileID: 1428912525}
   - component: {fileID: 1428912524}
   - component: {fileID: 1428912523}
+  - component: {fileID: 1428912527}
   m_Layer: 5
   m_Name: P2Canvas
   m_TagString: Untagged
@@ -27408,6 +27409,18 @@ RectTransform:
   m_AnchoredPosition: {x: 6.98, y: -4.7989}
   m_SizeDelta: {x: 1409.9583, y: 3164.1404}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1428912527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428912522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b678bdf3626fc4a8bb272e7778f11f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CanvasScaleFixer
 --- !u!1 &1433230368
 GameObject:
   m_ObjectHideFlags: 0
@@ -27677,6 +27690,7 @@ GameObject:
   - component: {fileID: 1447152467}
   - component: {fileID: 1447152466}
   - component: {fileID: 1447152465}
+  - component: {fileID: 1447152469}
   m_Layer: 5
   m_Name: P1Canvas
   m_TagString: Untagged
@@ -27767,6 +27781,18 @@ RectTransform:
   m_AnchoredPosition: {x: -6.4, y: -4.7989}
   m_SizeDelta: {x: 1409.9583, y: 3164.1404}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1447152469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447152464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b678bdf3626fc4a8bb272e7778f11f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CanvasScaleFixer
 --- !u!1 &1447976271
 GameObject:
   m_ObjectHideFlags: 0

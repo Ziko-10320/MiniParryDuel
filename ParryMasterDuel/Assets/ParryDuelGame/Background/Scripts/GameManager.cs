@@ -135,9 +135,10 @@ public class GameManager : MonoBehaviour
         if (DamagePopup.Instance != null)
         {
             DamagePopup.Instance.p1Canvas.transform.SetParent(player1Instance.transform);
-            DamagePopup.Instance.p1Canvas.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            DamagePopup.Instance.p1Canvas.transform.localPosition = new Vector3(0f, popupCanvasYOffset, 0f);
+
             DamagePopup.Instance.p2Canvas.transform.SetParent(player2Instance.transform);
-            DamagePopup.Instance.p2Canvas.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            DamagePopup.Instance.p2Canvas.transform.localPosition = new Vector3(0f, popupCanvasYOffset, 0f);
         }
         SetPlayersInputEnabled(false);
 
