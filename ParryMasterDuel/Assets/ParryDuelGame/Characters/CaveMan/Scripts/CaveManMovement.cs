@@ -411,6 +411,7 @@ public class CaveManMovement : MonoBehaviour, IFinishable
         if (currentPosture <= 0f)
         {
             currentPosture = 0f;
+            TriggerStun();
         }
     }
 

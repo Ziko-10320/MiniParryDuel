@@ -18,7 +18,7 @@ public class CaveManBoomerang : MonoBehaviour
     [Header("Rotation")]
     public float spinSpeed = 720f;
 
-    private Transform owner;
+    public Transform owner;
     private Transform spawnPoint;
     private Vector2 travelDirection;
     private float distanceTravelled;
@@ -138,6 +138,9 @@ public class CaveManBoomerang : MonoBehaviour
 
             SoldierHealth soldier = hit.GetComponent<SoldierHealth>();
             if (soldier != null) { soldier.TakeDamage(attackDamage, transform.position); hasHit = true; }
+
+            CaveManHealth caveMan = hit.GetComponent<CaveManHealth>();
+            if (caveMan != null) { caveMan.TakeDamage(attackDamage, transform.position); hasHit = true; }
         }
     }
 

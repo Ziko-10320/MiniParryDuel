@@ -90,11 +90,15 @@ public class NinjaHealth : MonoBehaviour
                 attackersoldier.TriggerParryStun(transform.position);
                 attackersoldier.ReceiveParryPostureDamage(movement.parryPostureDamage);
             }
-            CaveManMovement attackerCM = FindAttacker<CaveManMovement>(attackerPosition);
-            if (attackerCM != null)
+            CaveManBoomerang boomerang = FindAttacker<CaveManBoomerang>(attackerPosition);
+            if (boomerang != null)
             {
-                attackerCM.TriggerParryStun(transform.position);
-                attackerCM.ReceiveParryPostureDamage(movement.parryPostureDamage);
+                CaveManMovement attackerCM = boomerang.owner.GetComponent<CaveManMovement>();
+                if (attackerCM != null)
+                {
+                    attackerCM.TriggerParryStun(transform.position);
+                    attackerCM.ReceiveParryPostureDamage(movement.parryPostureDamage);
+                }
             }
             movement.parryInstantBlock = true;
             return; // parry absorbs everything, no damage, no posture damage

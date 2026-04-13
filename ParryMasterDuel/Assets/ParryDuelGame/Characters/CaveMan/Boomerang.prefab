@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 781737365873945664}
   - component: {fileID: 3525347002022629077}
   - component: {fileID: 6150284467656144676}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: boomeramgSlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -99,7 +99,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8942894393634117478}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: AttackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 1003739895286429570}
   - component: {fileID: -8735375035620610624}
   - component: {fileID: 9011464375819635731}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Boomerang
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -324,7 +324,7 @@ MonoBehaviour:
   attackRadius: 0.65
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 1920
+    m_Bits: 3968
   attackPoint: {fileID: 8942894393634117478}
   spinSpeed: 0
   meshRenderer: {fileID: 6150284467656144676}
