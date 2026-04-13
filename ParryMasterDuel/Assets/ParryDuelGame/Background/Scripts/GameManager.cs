@@ -212,12 +212,24 @@ public class GameManager : MonoBehaviour
         else if (player == player2Instance)
             StartCoroutine(ShowResultThenPanel("P1 Wins!"));
     }
-
+    void TriggerWinnerDance(GameObject winner)
+    {
+        if (winner == null) return;
+        Animator anim = winner.GetComponent<Animator>();
+        if (anim != null) anim.SetTrigger("Dance");
+    }
     IEnumerator ShowResultThenPanel(string result)
     {
         if (gameOver) yield break;
         gameOver = true;
         SetPlayersInputEnabled(false);
+
+        // Trigger dance on winner
+        if (result == "P1 Wins!")
+            TriggerWinnerDance(player1Instance);
+        else if (result == "P2 Wins!")
+            TriggerWinnerDance(player2Instance);
+        // no dance on tie
 
         if (resultText != null)
         {
