@@ -9,7 +9,10 @@ public class CharacterSelectManager : MonoBehaviour
 {
     [Header("Character Names (must match prefab names in Resources)")]
     public string[] characterNames = { "Knight", "Ninja", "Caveman", "Soldier", "Viking" };
-
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip browseSound;
+    public AudioClip confirmSound;
     [Header("Character Sprites")]
     public Sprite[] characterSprites;
     public SceneFader fader;
@@ -89,17 +92,20 @@ public class CharacterSelectManager : MonoBehaviour
             {
                 p1Index = (p1Index - 1 + characterNames.Length) % characterNames.Length;
                 RefreshUI();
+                if (browseSound != null) audioSource.PlayOneShot(browseSound);
             }
             if (Keyboard.current.dKey.wasPressedThisFrame)
             {
                 p1Index = (p1Index + 1) % characterNames.Length;
                 RefreshUI();
+                if (browseSound != null) audioSource.PlayOneShot(browseSound);
             }
             if (Keyboard.current.eKey.wasPressedThisFrame)
             {
                 p1Confirmed = true;
                 if (p1StatusText != null) p1StatusText.text = "READY!";
                 SetP1ConfirmVisuals(true);
+                if (confirmSound != null) audioSource.PlayOneShot(confirmSound);
                 CheckBothConfirmed();
                 return;
             }
@@ -127,17 +133,20 @@ public class CharacterSelectManager : MonoBehaviour
             {
                 p2Index = (p2Index - 1 + characterNames.Length) % characterNames.Length;
                 RefreshUI();
+                if (browseSound != null) audioSource.PlayOneShot(browseSound);
             }
             if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
             {
                 p2Index = (p2Index + 1) % characterNames.Length;
                 RefreshUI();
+                if (browseSound != null) audioSource.PlayOneShot(browseSound);
             }
             if (Keyboard.current.mKey.wasPressedThisFrame)
             {
                 p2Confirmed = true;
                 if (p2StatusText != null) p2StatusText.text = "READY!";
                 SetP2ConfirmVisuals(true);
+                if (confirmSound != null) audioSource.PlayOneShot(confirmSound);
                 CheckBothConfirmed();
                 return;
             }

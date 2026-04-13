@@ -8,6 +8,7 @@ public class SoldierHealth : MonoBehaviour
     public float CurrentHealth => currentHealth;
     [Header("Knockback")]
     public float knockbackForce = 5f;
+    public bool isPlayer1;
     public float knockbackDuration = 0.2f;
     [Header("Audio")]
     public AudioSource audioSource;
@@ -123,6 +124,11 @@ public class SoldierHealth : MonoBehaviour
         }
 
         currentHealth -= amount;
+        if (DamagePopup.Instance != null)
+        {
+            if (isPlayer1) DamagePopup.Instance.ShowP1(amount);
+            else DamagePopup.Instance.ShowP2(amount);
+        }
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
         rb.linearVelocity = Vector2.zero;

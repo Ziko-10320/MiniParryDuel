@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     public AudioClip environmentLoop;
     [Header("Result UI")]
     public TextMeshProUGUI resultText;
-
+    public float popupCanvasYOffset = 1.5f;
     [Header("End Panel")]
     public GameObject endPanel;
     public Button restartButton;
@@ -117,7 +117,8 @@ public class GameManager : MonoBehaviour
 
         player1Instance = Instantiate(p1Prefab, player1SpawnPoint.position, player1SpawnPoint.rotation);
         player2Instance = Instantiate(p2Prefab, player2SpawnPoint.position, player2SpawnPoint.rotation);
-
+        SetPlayerTag(player1Instance, true);
+        SetPlayerTag(player2Instance, false);
         Vector3 p2Scale = player2Instance.transform.localScale;
         player2Instance.transform.localScale = new Vector3(-Mathf.Abs(p2Scale.x), p2Scale.y, p2Scale.z);
         if (p1HealthBar != null)
@@ -131,7 +132,13 @@ public class GameManager : MonoBehaviour
 
         if (InputManager.Instance != null)
             InputManager.Instance.SetPlayers(player1Instance, player2Instance);
-
+        if (DamagePopup.Instance != null)
+        {
+            DamagePopup.Instance.p1Canvas.transform.SetParent(player1Instance.transform);
+            DamagePopup.Instance.p1Canvas.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            DamagePopup.Instance.p2Canvas.transform.SetParent(player2Instance.transform);
+            DamagePopup.Instance.p2Canvas.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+        }
         SetPlayersInputEnabled(false);
 
         if (countdownText != null) countdownText.gameObject.SetActive(true);
@@ -143,6 +150,17 @@ public class GameManager : MonoBehaviour
 
         SetPlayersInputEnabled(true);
         gameStarted = true;
+    }
+
+    void SetPlayerTag(GameObject player, bool isP1)
+    {
+        var scripts = player.GetComponents<MonoBehaviour>();
+        // set on whichever health script is present
+        if (player.GetComponent<KnightHealth>()) player.GetComponent<KnightHealth>().isPlayer1 = isP1;
+        if (player.GetComponent<VikingHealth>()) player.GetComponent<VikingHealth>().isPlayer1 = isP1;
+        if (player.GetComponent<NinjaHealth>()) player.GetComponent<NinjaHealth>().isPlayer1 = isP1;
+        if (player.GetComponent<SoldierHealth>()) player.GetComponent<SoldierHealth>().isPlayer1 = isP1;
+        if (player.GetComponent<CaveManHealth>()) player.GetComponent<CaveManHealth>().isPlayer1 = isP1;
     }
     void SelectRandomSky()
     {

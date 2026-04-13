@@ -679,7 +679,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.11, y: -5.076, z: 0}
-  m_LocalScale: {x: -1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 893507129824580467}
@@ -809,6 +809,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6d01d416b73ca794e912c8c2e62681dc, type: 3}
   - {fileID: 8300000, guid: 80cbfe062d9ac99448214c0c9e5b4c37, type: 3}
   moveSpeed: 6.5
+  postureRegenWaitTime: 2
   canJump: 1
   jumpForce: 20
   groundLayer:
@@ -942,9 +943,9 @@ MonoBehaviour:
   maxHealth: 100
   knockbackForce: 7
   knockbackDuration: 0.2
+  isPlayer1: 0
   bloodPrefab: {fileID: 3847384204462952536, guid: b505d72260b1a4e42bc4fbff0989ef67, type: 3}
   bloodSpawnPoint: {fileID: 8393408741825653337}
-  parryPostureDamage: 30
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
   CameraShakeParry: {fileID: 11400000, guid: efa127c7cb28a15418d24a7fdea516f5, type: 2}
 --- !u!82 &7758967372496850661

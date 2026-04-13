@@ -7,7 +7,8 @@ public class HealthBarUI : MonoBehaviour
     [Header("Health Sliders")]
     public Slider mainSlider;
     public Slider delayedSlider;
-
+    public TextMeshProUGUI healthValueText;
+    public TextMeshProUGUI postureValueText;
     [Header("Posture Slider")]
     public Slider postureSlider; // The new posture slider
     public Slider postureDelayedSlider;
@@ -81,6 +82,8 @@ public class HealthBarUI : MonoBehaviour
             postureDelayedSlider.maxValue = maxPosture;
             postureDelayedSlider.value = maxPosture;
         }
+        if (healthValueText != null)
+            healthValueText.text = Mathf.CeilToInt(maxHealth) + " / " + Mathf.RoundToInt(maxHealth);
         // Set portrait and name
         if (characterPortrait != null && portrait != null)
             characterPortrait.sprite = portrait;
@@ -99,8 +102,11 @@ public class HealthBarUI : MonoBehaviour
             {
                 currentHealth = newHealth;
                 mainSlider.value = currentHealth;
+                
                 delayTimer = delayTime;
             }
+            if (healthValueText != null)
+                healthValueText.text = Mathf.RoundToInt(currentHealth) + " / " + Mathf.CeilToInt(maxHealth);
             if (delayTimer > 0f)
             {
                 delayTimer -= Time.deltaTime;
@@ -117,7 +123,12 @@ public class HealthBarUI : MonoBehaviour
         {
             float newPosture = GetCurrentPosture(movementScript);
             postureSlider.value = newPosture;
-
+            if (postureValueText != null)
+            {
+                float maxP = GetMaxPosture(movementScript);
+                float displayPosture = Mathf.Clamp(delayedPosture, 0f, maxP);
+                postureValueText.text = Mathf.RoundToInt(displayPosture) + " / " + Mathf.RoundToInt(maxP);
+            }
             if (newPosture < lastKnownPosture)
             {
                 // posture dropped — trigger delay

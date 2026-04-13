@@ -18,7 +18,7 @@ public class VikingHealth : MonoBehaviour
     [Header("VFX")]
     public GameObject bloodPrefab;
     public Transform bloodSpawnPoint;
-
+    public bool isPlayer1;
     private Rigidbody2D rb;
     private Animator animator;
     private bool isKnockedBack;
@@ -123,6 +123,11 @@ public class VikingHealth : MonoBehaviour
         }
 
         currentHealth -= amount;
+        if (DamagePopup.Instance != null)
+        {
+            if (isPlayer1) DamagePopup.Instance.ShowP1(amount);
+            else DamagePopup.Instance.ShowP2(amount);
+        }
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
         Vector2 knockbackDir = ((Vector2)transform.position - attackerPosition).normalized;
         rb.linearVelocity = Vector2.zero;
