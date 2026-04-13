@@ -432,6 +432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaveManHealth
   maxHealth: 100
+  isPlayer1: 0
   knockbackForce: 7
   knockbackDuration: 0.2
   audioSource: {fileID: 5376041600928102489}
@@ -667,13 +668,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3124891632621821643}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.375, y: 0.76499987, z: -0.378}
+  m_LocalRotation: {x: -0, y: -0, z: 0.00086389395, w: 0.99999964}
+  m_LocalPosition: {x: -0.37352735, y: 0.76447433, z: -0.378}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2066422376218932483}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.077, y: 0.007, z: -10.05}
 --- !u!212 &7018483405681821273
 SpriteRenderer:
   serializedVersion: 2
