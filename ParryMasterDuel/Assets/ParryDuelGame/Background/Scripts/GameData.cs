@@ -6,7 +6,8 @@ public class GameData : MonoBehaviour
 
     public int Player1CharacterIndex = 0;
     public int Player2CharacterIndex = 1;
-
+    public int gamesPlayedSinceAd = 0;    
+    public int gamesBeforeAd = 2;
     void Awake()
     {
         if (Instance != null)

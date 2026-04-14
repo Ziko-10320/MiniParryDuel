@@ -809,7 +809,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6d01d416b73ca794e912c8c2e62681dc, type: 3}
   - {fileID: 8300000, guid: 80cbfe062d9ac99448214c0c9e5b4c37, type: 3}
   moveSpeed: 6.5
-  postureRegenWaitTime: 2
+  postureRegenWaitTime: 3
   canJump: 1
   jumpForce: 20
   groundLayer:
@@ -825,14 +825,14 @@ MonoBehaviour:
   isPlayer2: 1
   attackPoint: {fileID: 7388693125178620200}
   attackBox: {x: 2.91, y: 2.36}
-  attackDamage: 25
+  attackDamage: 10
   enemyLayer:
     serializedVersion: 2
     m_Bits: 3968
   CameraShake: {fileID: 11400000, guid: 43c0b0a4df1b9ba4793561765754cdc6, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6
-  maxPosture: 100
+  maxPosture: 75
   postureRegen: 10
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}

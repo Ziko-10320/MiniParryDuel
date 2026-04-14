@@ -317,16 +317,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaveManBoomerang
   travelSpeed: 40
-  maxDistance: 20
+  maxDistance: 10
   returnSpeed: 50
   pickupRadius: 0.5
-  attackDamage: 20
+  attackDamage: 15
   attackRadius: 0.65
   enemyLayer:
     serializedVersion: 2
     m_Bits: 3968
   attackPoint: {fileID: 8942894393634117478}
   spinSpeed: 0
+  owner: {fileID: 0}
   meshRenderer: {fileID: 6150284467656144676}
 --- !u!114 &9011464375819635731
 MonoBehaviour:

@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
 using UnityEngine.InputSystem;
-
+using CrazyGames;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -224,12 +224,10 @@ public class GameManager : MonoBehaviour
         gameOver = true;
         SetPlayersInputEnabled(false);
 
-        // Trigger dance on winner
         if (result == "P1 Wins!")
             TriggerWinnerDance(player1Instance);
         else if (result == "P2 Wins!")
             TriggerWinnerDance(player2Instance);
-        // no dance on tie
 
         if (resultText != null)
         {
@@ -238,6 +236,35 @@ public class GameManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(1.5f);
+
+        // --- AD LOGIC ---
+        if (GameData.Instance != null)
+        {
+            GameData.Instance.gamesPlayedSinceAd++;
+
+            if (GameData.Instance.gamesPlayedSinceAd >= GameData.Instance.gamesBeforeAd)
+            {
+                GameData.Instance.gamesPlayedSinceAd = 0;
+
+                CrazySDK.Init(() =>
+                {
+                    CrazySDK.Ad.RequestAd(
+                        CrazyAdType.Midgame,
+                        () => { /* Ad started - audio/time already handled by SDK */ },
+                        (error) => { ShowEndPanel(); }, // on error, just show panel
+                        () => { ShowEndPanel(); }       // on finish, show panel
+                    );
+                });
+
+                yield break; // wait for ad callbacks to show the panel
+            }
+        }
+        // ----------------
+
+        ShowEndPanel();
+    }
+    void ShowEndPanel()
+    {
         if (endPanel != null) endPanel.SetActive(true);
     }
 

@@ -364,7 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274a781c65cdd024e9ebb61063810526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaveManMovement
-  moveSpeed: 5
+  moveSpeed: 4
   audioSource: {fileID: 5376041600928102489}
   runLoopClip: {fileID: 8300000, guid: d5b0956bf2e56954193febfe5c501024, type: 3}
   jumpClip: {fileID: 8300000, guid: 4339585a378434548a6b19221b407063, type: 3}
@@ -400,7 +400,7 @@ MonoBehaviour:
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}
   blockSparksSpawnPoint: {fileID: 1944032906565992728}
-  postureRegenWaitTime: 2
+  postureRegenWaitTime: 3
   blockCooldown: 0.5
   parryWindow: 0.2
   parryStunDuration: 0.5
@@ -431,7 +431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f890a188ff533a43b3f284fff06d380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaveManHealth
-  maxHealth: 100
+  maxHealth: 120
   isPlayer1: 0
   knockbackForce: 7
   knockbackDuration: 0.2

@@ -654,7 +654,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cee690bfbc6d224690b87a1a24a5a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoldierMovement
-  moveSpeed: 4
+  moveSpeed: 5
   audioSource: {fileID: 1919983622825620965}
   runLoopClip: {fileID: 8300000, guid: d5b0956bf2e56954193febfe5c501024, type: 3}
   jumpClip: {fileID: 8300000, guid: 4339585a378434548a6b19221b407063, type: 3}
@@ -679,19 +679,19 @@ MonoBehaviour:
   isPlayer2: 0
   attackPoint: {fileID: 4244563330292672843}
   attackBox: {x: 28.79, y: 1.29}
-  attackDamage: 25
+  attackDamage: 40
   enemyLayer:
     serializedVersion: 2
     m_Bits: 3968
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6
-  maxPosture: 100
+  maxPosture: 130
   postureRegen: 10
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}
   blockSparksSpawnPoint: {fileID: 1199490124093898291}
-  postureRegenWaitTime: 2
+  postureRegenWaitTime: 3
   blockCooldown: 0.5
   parryWindow: 0.2
   parryStunDuration: 0.5
@@ -719,7 +719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa935e96431742ad9222511618f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoldierHealth
-  maxHealth: 100
+  maxHealth: 175
   knockbackForce: 7
   isPlayer1: 0
   knockbackDuration: 0.2

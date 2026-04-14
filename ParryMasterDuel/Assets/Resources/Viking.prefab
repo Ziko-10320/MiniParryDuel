@@ -922,7 +922,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afe51895d61906d4faf43138b1df39cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VikingMovement
-  moveSpeed: 4
+  moveSpeed: 4.5
   audioSource: {fileID: 8543089649435195645}
   runLoopClip: {fileID: 8300000, guid: d5b0956bf2e56954193febfe5c501024, type: 3}
   jumpClip: {fileID: 8300000, guid: 4339585a378434548a6b19221b407063, type: 3}
@@ -942,7 +942,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheck: {fileID: 34186811961774621}
   groundCheckRadius: 0.2
-  postureRegenWaitTime: 2
+  postureRegenWaitTime: 3
   rollSpeed: 16
   rollDuration: 0.4
   doubleTapWindow: 0.3
@@ -951,14 +951,14 @@ MonoBehaviour:
   isPlayer2: 0
   attackPoint: {fileID: 8016247884998783953}
   attackBox: {x: 3.94, y: 2.25}
-  attackDamage: 25
+  attackDamage: 30
   enemyLayer:
     serializedVersion: 2
     m_Bits: 3968
   CameraShake: {fileID: 11400000, guid: 43c0b0a4df1b9ba4793561765754cdc6, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6
-  maxPosture: 100
+  maxPosture: 150
   postureRegen: 10
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}
@@ -1020,7 +1020,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fc77e85358897d41b010ef08213c26a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VikingHealth
-  maxHealth: 100
+  maxHealth: 200
   knockbackForce: 7
   knockbackDuration: 0.2
   audioSource: {fileID: 8543089649435195645}

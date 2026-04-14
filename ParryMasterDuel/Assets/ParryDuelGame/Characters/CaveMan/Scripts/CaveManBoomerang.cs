@@ -140,7 +140,8 @@ public class CaveManBoomerang : MonoBehaviour
             if (soldier != null) { soldier.TakeDamage(attackDamage, transform.position); hasHit = true; }
 
             CaveManHealth caveMan = hit.GetComponent<CaveManHealth>();
-            if (caveMan != null) { caveMan.TakeDamage(attackDamage, transform.position); hasHit = true; }
+            if (caveMan != null && hit.transform != owner && hit.transform.parent != owner)
+            { caveMan.TakeDamage(attackDamage, transform.position); hasHit = true; }
         }
     }
 

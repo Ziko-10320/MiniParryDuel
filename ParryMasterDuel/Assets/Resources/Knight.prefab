@@ -194,7 +194,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3de4c150499325449a1a37e38a4b2f35, type: 3}
   - {fileID: 8300000, guid: 6d01d416b73ca794e912c8c2e62681dc, type: 3}
   - {fileID: 8300000, guid: 80cbfe062d9ac99448214c0c9e5b4c37, type: 3}
-  moveSpeed: 4
+  moveSpeed: 4.5
   canJump: 1
   jumpForce: 20
   groundLayer:
@@ -202,7 +202,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheck: {fileID: 629655314938597898}
   groundCheckRadius: 0.2
-  postureRegenWaitTime: 2
+  postureRegenWaitTime: 3
   rollSpeed: 16
   rollDuration: 0.4
   doubleTapWindow: 0.3
@@ -211,14 +211,14 @@ MonoBehaviour:
   isPlayer2: 1
   attackPoint: {fileID: 9175055124341293985}
   attackBox: {x: 4.73, y: 3.7}
-  attackDamage: 25
+  attackDamage: 50
   enemyLayer:
     serializedVersion: 2
     m_Bits: 3968
   CameraShake: {fileID: 11400000, guid: 92ac5db13f57a8e4d8157a00b90783ef, type: 2}
   CameraShakeheavy: {fileID: 11400000, guid: 31bad28631b2d2c4ca3bb8c8eda8c7c3, type: 2}
   blockDamageReduction: 0.6
-  maxPosture: 100
+  maxPosture: 125
   postureRegen: 10
   stunDuration: 3
   blockSparksPrefab: {fileID: 5000443321340488407, guid: 63ffe63fb35cf6d469dc8311b9fdee80, type: 3}
@@ -299,7 +299,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c34eb477b3ae74241b20c16b6aca1a60, type: 3}
   - {fileID: 8300000, guid: 8b7109e2fe2e68446bcd699e789fb2c1, type: 3}
   - {fileID: 8300000, guid: 56364d6ac548f9f4ab7d40f7a333eb90, type: 3}
-  maxHealth: 100
+  maxHealth: 150
   isPlayer1: 0
   knockbackForce: 7
   knockbackDuration: 0.2
