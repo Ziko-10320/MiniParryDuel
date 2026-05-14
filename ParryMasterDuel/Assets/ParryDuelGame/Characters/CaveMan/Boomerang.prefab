@@ -316,11 +316,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 868388bcc7f789243adbb5f1d7c31efd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CaveManBoomerang
-  travelSpeed: 40
+  travelSpeed: 50
   maxDistance: 10
-  returnSpeed: 50
+  returnSpeed: 60
   pickupRadius: 0.5
-  attackDamage: 15
+  attackDamage: 20
   attackRadius: 0.65
   enemyLayer:
     serializedVersion: 2

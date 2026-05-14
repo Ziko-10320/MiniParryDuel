@@ -514,7 +514,6 @@ GameObject:
   - component: {fileID: 8694791891485864842}
   - component: {fileID: 268668140094449026}
   - component: {fileID: 4546097940886110267}
-  - component: {fileID: 7821306759894674359}
   - component: {fileID: 1919983622825620965}
   m_Layer: 10
   m_Name: Soldier
@@ -654,7 +653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cee690bfbc6d224690b87a1a24a5a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoldierMovement
-  moveSpeed: 5
+  moveSpeed: 4
   audioSource: {fileID: 1919983622825620965}
   runLoopClip: {fileID: 8300000, guid: d5b0956bf2e56954193febfe5c501024, type: 3}
   jumpClip: {fileID: 8300000, guid: 4339585a378434548a6b19221b407063, type: 3}
@@ -674,7 +673,7 @@ MonoBehaviour:
   rollSpeed: 16
   rollDuration: 0.4
   doubleTapWindow: 0.3
-  rollCooldown: 1
+  rollCooldown: 0.5
   isPlayer1: 1
   isPlayer2: 0
   attackPoint: {fileID: 4244563330292672843}
@@ -719,7 +718,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97fa935e96431742ad9222511618f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoldierHealth
-  maxHealth: 175
+  maxHealth: 160
   knockbackForce: 7
   isPlayer1: 0
   knockbackDuration: 0.2
@@ -773,36 +772,6 @@ MonoBehaviour:
   fadeToColor: {r: 1, g: 1, b: 1, a: 0}
   fadeOut: 1
   matchScale: 1
---- !u!114 &7821306759894674359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5474456946197499511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: 
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!82 &1919983622825620965
 AudioSource:
   m_ObjectHideFlags: 0

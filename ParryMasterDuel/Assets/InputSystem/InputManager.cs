@@ -14,7 +14,7 @@ public class InputManager : MonoBehaviour
     private InputAction p2Move, p2Attack, p2Block, p2Jump;
 
     private bool isSetup = false;
-
+    public InputActionAsset inputActions;
     void Awake()
     {
         Instance = this;
@@ -23,23 +23,29 @@ public class InputManager : MonoBehaviour
     // ?? Called by GameManager after spawning both players ??????
     public void SetPlayers(GameObject p1, GameObject p2)
     {
-        // Grab whichever movement script is on each spawned character
         p1Movement = GetMovement(p1);
         p2Movement = GetMovement(p2);
 
-        if (p1Movement == null) { Debug.LogError("No movement script found on Player 1!"); return; }
-        if (p2Movement == null) { Debug.LogError("No movement script found on Player 2!"); return; }
+        if (p1Movement == null) { Debug.LogError("No movement script on P1!"); return; }
+        if (p2Movement == null) { Debug.LogError("No movement script on P2!"); return; }
 
-        // Grab PlayerInput components
+        // Grab the shared input asset from whichever PlayerInput still exists
+        // OR reference it directly — see below
         PlayerInput p1Input = p1.GetComponent<PlayerInput>();
         PlayerInput p2Input = p2.GetComponent<PlayerInput>();
 
-        if (p1Input == null) { Debug.LogError("No PlayerInput on Player 1!"); return; }
-        if (p2Input == null) { Debug.LogError("No PlayerInput on Player 2!"); return; }
+        // Disable both PlayerInput components so they stop interfering
+        if (p1Input != null) p1Input.enabled = false;
+        if (p2Input != null) p2Input.enabled = false;
 
-        // Always use Player1 map for p1 and Player2 map for p2
-        var p1Map = p1Input.actions.FindActionMap("Player1");
-        var p2Map = p2Input.actions.FindActionMap("Player2");
+        // Grab the asset directly from P1's component before disabling
+        InputActionAsset asset = inputActions;
+
+        if (asset == null) { Debug.LogError("No InputActionAsset found!"); return; }
+
+        // Get both maps from the single shared asset
+        var p1Map = asset.FindActionMap("Player1", throwIfNotFound: true);
+        var p2Map = asset.FindActionMap("Player2", throwIfNotFound: true);
 
         p1Move = p1Map.FindAction("Move");
         p1Attack = p1Map.FindAction("Attack");
@@ -51,11 +57,11 @@ public class InputManager : MonoBehaviour
         p2Block = p2Map.FindAction("Block");
         p2Jump = p2Map.FindAction("Jump");
 
-        // Enable all actions
-        p1Move.Enable(); p1Attack.Enable(); p1Block.Enable(); p1Jump.Enable();
-        p2Move.Enable(); p2Attack.Enable(); p2Block.Enable(); p2Jump.Enable();
+        // Enable the maps
+        p1Map.Enable();
+        p2Map.Enable();
 
-        // Hook up events
+        // Subscribe to events
         p1Attack.performed += OnP1Attack;
         p1Jump.performed += OnP1Jump;
         p1Block.started += OnP1BlockStart;
